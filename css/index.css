@@ -12,36 +12,6 @@ body {
 main {
   flex: 1;
 }
-nav,
-footer {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 10px;
-  background-color: rgb(0, 149, 168);
-  gap: 30px;
-  color: white;
-}
-.nav-menu {
-  display: flex;
-  list-style: none;
-  gap: 10px;
-}
-.nav-menu li a {
-  text-decoration: none;
-  font-size: 1.2rem;
-  color: rgb(187, 187, 187);
-}
-.nav-menu li a:hover {
-  text-decoration: underline;
-  color: white;
-  transition: all 0.2s ease-in-out;
-}
-.nav-menu li .selected-nav {
-  text-decoration: underline;
-  font-weight: bold;
-  color: white;
-}
 .quienes-somos {
   padding: 10px;
   background-color: rgb(0, 149, 168);
