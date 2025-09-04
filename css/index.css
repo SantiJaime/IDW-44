@@ -7,6 +7,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 main {
   flex: 1;
@@ -29,11 +30,21 @@ footer {
 .nav-menu li a {
   text-decoration: none;
   font-size: 1.2rem;
+  color: rgb(187, 187, 187);
+}
+.nav-menu li a:hover {
+  text-decoration: underline;
+  color: white;
+  transition: all 0.2s ease-in-out;
+}
+.nav-menu li .selected-nav {
+  text-decoration: underline;
+  font-weight: bold;
   color: white;
 }
 .quienes-somos {
   padding: 10px;
-  background-color: rgb(0, 238, 255);
+  background-color: rgb(0, 149, 168);
   color: black;
   text-align: center;
   font-size: 1.2rem;
@@ -46,16 +57,14 @@ footer {
 }
 .profesionales{
   padding: 10px;
-  background-color: rgb(0, 110, 255);
   color: black;
   text-align: center;
   font-size: 1.2rem;
   margin: 10px;
   border-radius: 10px;
-  color: white;
 }
 .card {
-  border: 1px solid #0077ff;
+  border: 1px solid rgb(0, 149, 168);
   border-radius: 0.5rem;
   overflow: hidden;
   max-width: 300px;
