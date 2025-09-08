@@ -64,3 +64,40 @@ main {
   justify-content: center;
   gap: 20px;
 }
+/* Sección de obras solciales */
+#ObrasS {
+  text-align: center;
+  margin: 50px auto;
+}
+
+#ObrasS h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 25px;
+  background: #51a8d1;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
