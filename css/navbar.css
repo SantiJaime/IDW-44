@@ -30,3 +30,15 @@ footer {
   font-weight: bold;
   color: white;
 }
+
+.container-fluid{
+  background-color: rgb(0, 149, 168);
+}  
+
+.offcanvas-body{
+    background-color: rgb(0, 149, 168);
+}
+
+.offcanvas-header{
+  background-color: rgb(0, 149, 168);
+}
