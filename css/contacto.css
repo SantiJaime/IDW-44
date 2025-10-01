@@ -2,14 +2,18 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
+  min-height: 100vh; /* Asegura que el main ocupe toda la pantalla */
+  padding-top: 90px; /* Compensa el navbar fijo (80px + 10px extra) */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 40px;
 }
 
 main section {
   background: #fff;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 600px;
   width: 100%;
 }
