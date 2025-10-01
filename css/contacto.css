@@ -2,8 +2,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Asegura que el main ocupe toda la pantalla */
-  padding-top: 90px; /* Compensa el navbar fijo (80px + 10px extra) */
+  min-height: 100vh;
+  padding-top: 90px;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 40px;
