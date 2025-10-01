@@ -15,6 +15,7 @@ body {
 }
 main {
   flex: 1;
+  padding-top: 90px; /* Compensa el navbar fijo + 10px extra de separación */
 }
 .quienes-somos {
   padding: 10px;
