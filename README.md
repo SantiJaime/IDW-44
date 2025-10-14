@@ -15,3 +15,4 @@
 - **CSS**
 - **Herramientas de control de versiones: Git & GitHub**  
 - **Bootstrap**  
+- **Javascript**
