@@ -1,79 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IDW S.A - Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="../css/navbar.css" />
     <link rel="stylesheet" href="../css/index.css" />
-</head>
-<body>
-    <header>
-      <nav class="navbar nav-color fixed-top p-1">
-        <div class="container-fluid">
-          <a href="../index.html">
-            <img src="../img/logo.png" alt="Centro médico IDW-44" width="100" />
-          </a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div
-            class="offcanvas offcanvas-end"
-            tabindex="-1"
-            id="offcanvasNavbar"
-            aria-labelledby="offcanvasNavbarLabel"
-          >
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">IDW-44</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                  <a class="nav-link" href="../index.html">Inicio</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="contacto.html">Contacto</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="institucional.html">Institucional</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link active" href="login.html">Acceso Administradores</a>
-                </li>
-              </ul>
-            </div>
+  </head>
+  <body>
+    <header id="navbar-container"></header>
+    <main
+      class="d-flex align-items-center justify-content-center"
+      style="min-height: 80vh"
+    >
+      <div class="card p-4 shadow" style="max-width: 400px; width: 100%">
+        <h2 class="card-title text-center mb-4">Acceso de Administradores</h2>
+        <form id="login-form">
+          <div class="mb-3">
+            <label for="username" class="form-label">Usuario</label>
+            <input type="text" class="form-control" id="username" required />
           </div>
-        </div>
-      </nav>
-    </header>
-    <main class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
-      <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
-          <h2 class="card-title text-center mb-4">Acceso de Administradores</h2>
-          <form id="login-form">
-              <div class="mb-3">
-                  <label for="username" class="form-label">Usuario</label>
-                  <input type="text" class="form-control" id="username" required />
-              </div>
-              <div class="mb-3">
-                  <label for="password" class="form-label">Contraseña</label>
-                  <input type="password" class="form-control" id="password" required />
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-          </form>
+          <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+        </form>
       </div>
     </main>
     <footer>
@@ -98,12 +61,13 @@
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script>
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            window.location.href = 'admin.html';
-        });
-    </script>
-</body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/navbar.js"></script>
+    <script src="../js/login.js"></script>
+  </body>
 </html>
