@@ -1,6 +1,31 @@
 // La clave que usaremos para guardar los datos en LocalStorage
 const STORAGE_KEY = 'medicos_idw';
 
+const obrasSociales = [
+  "OSDE",
+  "OSECAC",
+  "SWISS MEDICAL",
+  "GALEANO",
+  "SANCOR SALUD",
+  "OSPE",
+  "UPCN"
+];
+
+localStorage.setItem("obrasSociales", JSON.stringify(obrasSociales));
+
+function renderObrasSociales() {
+  const obrasSocialesContainer = document.getElementById("obras-sociales-container");
+  const obrasSocialesLS = JSON.parse(localStorage.getItem("obrasSociales"));
+
+  obrasSocialesLS.forEach((nombreObraSocial) => {
+    const obraSocialButton = document.createElement("button");
+    obraSocialButton.classList.add("button");
+    obraSocialButton.textContent = nombreObraSocial;
+    
+    obrasSocialesContainer.appendChild(obraSocialButton);
+  });
+}
+
 /**
  * Función para cargar y mostrar los médicos en la página principal
  */
@@ -31,4 +56,5 @@ function displayDoctors() {
 // Llamar a la función de visualización cuando la página cargue
 document.addEventListener('DOMContentLoaded', () => {
     displayDoctors();
+    renderObrasSociales();
 });
