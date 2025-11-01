@@ -1,52 +1,6 @@
 // La clave que usaremos para guardar los datos en LocalStorage
 const STORAGE_KEY = "medicos_idw";
 
-// Lista inicial de médicos que se cargará por defecto
-const initialDoctors = [
-  {
-    id: 1,
-    nombre: "Dr. Juan Pérez",
-    especialidad: "Cardiología",
-    imagen: "../img/doctor4.png",
-  },
-  {
-    id: 2,
-    nombre: "Dra. María Gómez",
-    especialidad: "Pediatría",
-    imagen: "../img/doctora1.png",
-  },
-  {
-    id: 3,
-    nombre: "Dra. Fátima Hernández",
-    especialidad: "Neurología",
-    imagen: "../img/doctora5.jpg",
-  },
-  {
-    id: 4,
-    nombre: "Dr. Pedro Rodríguez",
-    especialidad: "Traumatología",
-    imagen: "../img/doctor3.jpg",
-  },
-  {
-    id: 5,
-    nombre: "Dr. Facundo González",
-    especialidad: "Radiología",
-    imagen: "../img/doctor2.png",
-  },
-];
-
-/**
- * Función para inicializar los datos de los médicos en LocalStorage
- */
-function initializeData() {
-  if (!localStorage.getItem(STORAGE_KEY)) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialDoctors));
-    console.log("Datos de médicos iniciales guardados en LocalStorage.");
-    return;
-  }
-  console.log("Los datos de médicos ya existen en LocalStorage.");
-}
-
 /**
  * Función para cargar y mostrar los médicos en la tabla
  */
@@ -170,7 +124,6 @@ function handleEditFormSubmit(event) {
 
 // Llamar a las funciones de inicialización y visualización cuando la página cargue
 document.addEventListener("DOMContentLoaded", () => {
-  initializeData();
   displayDoctors();
 });
 
@@ -221,6 +174,3 @@ document.getElementById("cancel-edit-btn").addEventListener("click", () => {
   document.getElementById("edit-form-section").style.display = "none";
   document.getElementById("doctor-form").parentElement.style.display = "block";
 });
-
-// Exportar la lista inicial para usarla en otros archivos si es necesario
-export { initialDoctors };
