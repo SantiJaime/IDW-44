@@ -66,23 +66,23 @@ const initialDoctors = [
 const especialidades = [
   {
     id: 1,
-    Nombre: "Cardiología",
+    nombre: "Cardiología",
   },
   {
     id: 2,
-    Nombre: "Pediatría",
+    nombre: "Pediatría",
   },
   {
     id: 3,
-    Nombre: "Neurología",
+    nombre: "Neurología",
   },
   {
     id: 4,
-    Nombre: "Traumatología",
+    nombre: "Traumatología",
   },
   {
     id: 5,
-    Nombre: "Radiología",
+    nombre: "Radiología",
   },
 ];
 
@@ -145,12 +145,14 @@ function initializeData() {
   if (!localStorage.getItem("medicos_idw")) {
     localStorage.setItem("medicos_idw", JSON.stringify(initialDoctors));
     console.log("Datos de médicos iniciales guardados en LocalStorage.");
-    return;
   }
   if (!localStorage.getItem("especialidades")) {
     localStorage.setItem("especialidades", JSON.stringify(especialidades));
     console.log("Datos de especialidades iniciales guardados en LocalStorage.");
-    return;
+  }
+  if(!localStorage.getItem("obras-sociales")) {
+    localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
+    console.log("Datos de obras sociales iniciales guardados en LocalStorage.");
   }
   console.log("Los datos de médicos ya existen en LocalStorage.");
 }
