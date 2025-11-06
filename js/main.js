@@ -1,10 +1,8 @@
-// La clave que usaremos para guardar los datos en LocalStorage
 const STORAGE_KEY = "medicos_idw";
 let editEspecialidadId = null;
 let editDoctorId = null;
-/**
- * Función para cargar y mostrar los médicos en la tabla
- */
+
+// Médicos
 function displayDoctors() {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
@@ -24,9 +22,7 @@ function displayDoctors() {
                 <td>${doctor.obrasSociales.map(
                   (id) => obrasSociales.find((os) => os.id === id).nombre
                 )}</td>
-                <td><img src="${doctor.imagen}" alt="${
-        doctor.nombre
-      }" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
+                <td><img src="${doctor.imagen}" alt="${doctor.nombre}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
                 <td>
                     <button class="btn btn-danger btn-sm delete-btn" data-id="${
                       doctor.id
@@ -41,48 +37,12 @@ function displayDoctors() {
   }
 }
 
-function displayEspecialidades() {
-  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
-  const tableBody = document.getElementById("especialidades-table-body");
-  tableBody.innerHTML = "";
-
-  if (especialidades && especialidades.length > 0) {
-    especialidades.forEach((esp) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-                <td>${esp.id}</td>
-                <td>${esp.nombre}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm delete-btn" onclick="deleteEspecialidad(${esp.id})">Eliminar</button>
-                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editarEspecialidadModal" data-id="${esp.id}">Modificar</button>
-                </td>
-            `;
-      tableBody.appendChild(row);
-    });
-  }
-}
-
-/**
- * Función para guardar un nuevo médico
- * @param {object} newDoctor - El objeto del nuevo médico a guardar
- */
 function saveDoctor(newDoctor) {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   doctors.push(newDoctor);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
 }
 
-function saveEspecialidad(newEspecialidad) {
-  const especialidades =
-    JSON.parse(localStorage.getItem("especialidades")) || [];
-  especialidades.push(newEspecialidad);
-  localStorage.setItem("especialidades", JSON.stringify(especialidades));
-}
-
-/**
- * Función para manejar el envío del formulario de creación
- * @param {Event} event - El evento del formulario
- */
 function handleFormSubmit(event) {
   event.preventDefault();
 
@@ -119,74 +79,12 @@ function handleFormSubmit(event) {
   );
 }
 
-function handleEspecialidadFormSubmit(event) {
-  event.preventDefault();
-
-  const nameInput = document.getElementById("especialidad-name");
-
-  const newEspecialidad = {
-    id: Date.now(),
-    nombre: nameInput.value,
-  };
-
-  saveEspecialidad(newEspecialidad);
-  displayEspecialidades();
-  loadEspecialidadesOnSelect();
-
-  const modal = document.getElementById("crearEspecialidadModal");
-  const modalInstance = bootstrap.Modal.getInstance(modal);
-  modalInstance.hide();
-  nameInput.value = "";
-
-  Swal.fire(
-    "Especialidad creada correctamente",
-    "La especialidad ha sido creado con éxito",
-    "success"
-  );
-}
-
-/**
- * Función para eliminar un médico por su ID
- * @param {number} id - El ID del médico a eliminar
- */
 function deleteDoctor(id) {
   let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   doctors = doctors.filter((doctor) => doctor.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
 }
 
-function deleteEspecialidad(id) {
-  Swal.fire({
-    title: "¿Estás seguro de que quieres eliminar esta especialidad?",
-    text: "Esta acción no se puede deshacer",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Si, eliminar",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      let especialidades = JSON.parse(localStorage.getItem("especialidades"));
-      especialidades = especialidades.filter((esp) => esp.id !== parseInt(id));
-      localStorage.setItem("especialidades", JSON.stringify(especialidades));
-
-      displayEspecialidades();
-      loadEspecialidadesOnSelect();
-      Swal.fire({
-        title: "Especialidad eliminada correctamente",
-        icon: "success",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
-  });
-}
-
-/**
- * Función para precargar los datos del médico en el formulario de edición
- * @param {number} id - El ID del médico a editar
- */
 function loadDoctorForEditing(id) {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const doctorToEdit = doctors.find((doctor) => doctor.id === id);
@@ -214,10 +112,6 @@ function loadDoctorForEditing(id) {
   }
 }
 
-/**
- * Función para guardar los cambios de un médico editado
- * @param {Event} event - El evento del formulario
- */
 function handleEditFormSubmit(id) {
   const editedDoctor = {
     nombre: document.getElementById("edit-doctor-name").value,
@@ -250,6 +144,89 @@ function handleEditFormSubmit(id) {
     "El médico ha sido editado con éxito",
     "success"
   );
+}
+
+// Especialidades
+function displayEspecialidades() {
+  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+  const tableBody = document.getElementById("especialidades-table-body");
+  tableBody.innerHTML = "";
+
+  if (especialidades && especialidades.length > 0) {
+    especialidades.forEach((esp) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                <td>${esp.id}</td>
+                <td>${esp.nombre}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-btn" onclick="deleteEspecialidad(${esp.id})">Eliminar</button>
+                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editarEspecialidadModal" data-id="${esp.id}">Modificar</button>
+                </td>
+            `;
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function saveEspecialidad(newEspecialidad) {
+  const especialidades =
+    JSON.parse(localStorage.getItem("especialidades")) || [];
+  especialidades.push(newEspecialidad);
+  localStorage.setItem("especialidades", JSON.stringify(especialidades));
+}
+
+function handleEspecialidadFormSubmit(event) {
+  event.preventDefault();
+
+  const nameInput = document.getElementById("especialidad-name");
+
+  const newEspecialidad = {
+    id: Date.now(),
+    nombre: nameInput.value,
+  };
+
+  saveEspecialidad(newEspecialidad);
+  displayEspecialidades();
+  loadEspecialidadesOnSelect();
+
+  const modal = document.getElementById("crearEspecialidadModal");
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  modalInstance.hide();
+  nameInput.value = "";
+
+  Swal.fire(
+    "Especialidad creada correctamente",
+    "La especialidad ha sido creado con éxito",
+    "success"
+  );
+}
+
+function deleteEspecialidad(id) {
+  Swal.fire({
+    title: "¿Estás seguro de que quieres eliminar esta especialidad?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let especialidades = JSON.parse(localStorage.getItem("especialidades"));
+      especialidades = especialidades.filter((esp) => esp.id !== parseInt(id));
+      localStorage.setItem("especialidades", JSON.stringify(especialidades));
+
+      displayEspecialidades();
+      loadEspecialidadesOnSelect();
+      Swal.fire({
+        title: "Especialidad eliminada correctamente",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  });
 }
 
 function handleEspecialidadEditFormSubmit(id) {
@@ -299,19 +276,6 @@ function loadEspecialidadesOnSelect() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  displayDoctors();
-  displayEspecialidades();
-  loadEspecialidadesOnSelect();
-});
-
-// Obtener la referencia al formulario de creación y añadir el "listener"
-const doctorForm = document.getElementById("doctor-form");
-doctorForm.addEventListener("submit", handleFormSubmit);
-
-const especialidadForm = document.getElementById("especialidad-form");
-especialidadForm.addEventListener("submit", handleEspecialidadFormSubmit);
-
 function editEspecialidad(id) {
   const especialidades = JSON.parse(localStorage.getItem("especialidades"));
 
@@ -326,7 +290,12 @@ function editEspecialidad(id) {
   }
 }
 
-// Manejar clics en los botones de la tabla
+// Listeners
+document.addEventListener("DOMContentLoaded", () => {
+  displayDoctors();
+  displayEspecialidades();
+  loadEspecialidadesOnSelect();
+});
 document
   .getElementById("especialidades-table-body")
   .addEventListener("click", (event) => {
@@ -368,7 +337,6 @@ document
     }
   });
 
-// Obtener la referencia al formulario de edición y añadir el listener
 const editForm = document.getElementById("edit-doctor-form");
 editForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -383,8 +351,8 @@ editEspecialidadForm.addEventListener("submit", function (event) {
   handleEspecialidadEditFormSubmit(editEspecialidadId);
 });
 
-// Añadir el listener al botón de cancelar para ocultar el formulario
-document.getElementById("cancel-edit-btn").addEventListener("click", () => {
-  document.getElementById("edit-form-section").style.display = "none";
-  document.getElementById("doctor-form").parentElement.style.display = "block";
-});
+const doctorForm = document.getElementById("doctor-form");
+doctorForm.addEventListener("submit", handleFormSubmit);
+
+const especialidadForm = document.getElementById("especialidad-form");
+especialidadForm.addEventListener("submit", handleEspecialidadFormSubmit);
