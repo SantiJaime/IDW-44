@@ -1,29 +1,45 @@
-// La clave que usaremos para guardar los datos en LocalStorage
+if (!sessionStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
+
 const STORAGE_KEY = "medicos_idw";
 let editEspecialidadId = null;
 let editDoctorId = null;
-/**
- * Función para cargar y mostrar los médicos en la tabla
- */
+let editObraSocialId = null;
+
+function getNextId(storageKey) {
+  const items = JSON.parse(localStorage.getItem(storageKey)) || [];
+  if (items.length === 0) return 1;
+  const maxId = items.reduce((max, item) => (item.id > max ? item.id : max), 0);
+  return maxId + 1;
+}
+
+// --- FUNCIONES DE MEDICOS ---
+
 function displayDoctors() {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
-
   const tableBody = document.getElementById("medicos-table-body");
   tableBody.innerHTML = "";
 
   if (doctors && doctors.length > 0) {
     doctors.forEach((doctor) => {
       const row = document.createElement("tr");
+      const osNombres = doctor.obrasSociales
+        .map((id) => {
+          const os = obrasSociales.find((o) => o.id === id);
+          return os ? os.nombre : null;
+        })
+        .filter(Boolean)
+        .join(", ");
+
       row.innerHTML = `
                 <td>${doctor.id}</td>
                 <td>${doctor.nombre} ${doctor.apellido}</td>
                 <td>${doctor.especialidad}</td>
                 <td>${doctor.matricula}</td>
                 <td>$${doctor.valorConsulta}</td>
-                <td>${doctor.obrasSociales.map(
-                  (id) => obrasSociales.find((os) => os.id === id).nombre
-                )}</td>
+                <td>${osNombres}</td>
                 <td><img src="${doctor.imagen}" alt="${
         doctor.nombre
       }" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
@@ -41,48 +57,12 @@ function displayDoctors() {
   }
 }
 
-function displayEspecialidades() {
-  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
-  const tableBody = document.getElementById("especialidades-table-body");
-  tableBody.innerHTML = "";
-
-  if (especialidades && especialidades.length > 0) {
-    especialidades.forEach((esp) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-                <td>${esp.id}</td>
-                <td>${esp.nombre}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm delete-btn" onclick="deleteEspecialidad(${esp.id})">Eliminar</button>
-                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editarEspecialidadModal" data-id="${esp.id}">Modificar</button>
-                </td>
-            `;
-      tableBody.appendChild(row);
-    });
-  }
-}
-
-/**
- * Función para guardar un nuevo médico
- * @param {object} newDoctor - El objeto del nuevo médico a guardar
- */
 function saveDoctor(newDoctor) {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   doctors.push(newDoctor);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
 }
 
-function saveEspecialidad(newEspecialidad) {
-  const especialidades =
-    JSON.parse(localStorage.getItem("especialidades")) || [];
-  especialidades.push(newEspecialidad);
-  localStorage.setItem("especialidades", JSON.stringify(especialidades));
-}
-
-/**
- * Función para manejar el envío del formulario de creación
- * @param {Event} event - El evento del formulario
- */
 function handleFormSubmit(event) {
   event.preventDefault();
 
@@ -90,15 +70,18 @@ function handleFormSubmit(event) {
   const lastNameInput = document.getElementById("doctor-lastname");
   const specialtyInput = document.getElementById("doctor-specialty");
   const matriculaInput = document.getElementById("doctor-matricula");
+  const valorInput = document.getElementById("doctor-valor-consulta");
   const imageInput = document.getElementById("doctor-image");
 
   const newDoctor = {
-    id: Date.now(),
+    id: getNextId(STORAGE_KEY),
     nombre: nameInput.value,
     apellido: lastNameInput.value,
     especialidad: specialtyInput.value,
     matricula: matriculaInput.value,
+    valorConsulta: valorInput.value,
     imagen: imageInput.value,
+    obrasSociales: [],
   };
 
   saveDoctor(newDoctor);
@@ -108,9 +91,7 @@ function handleFormSubmit(event) {
   const modalInstance = bootstrap.Modal.getInstance(modal);
   modalInstance.hide();
 
-  nameInput.value = "";
-  specialtyInput.value = "";
-  imageInput.value = "";
+  event.target.reset();
 
   Swal.fire(
     "Médico creado correctamente",
@@ -119,74 +100,12 @@ function handleFormSubmit(event) {
   );
 }
 
-function handleEspecialidadFormSubmit(event) {
-  event.preventDefault();
-
-  const nameInput = document.getElementById("especialidad-name");
-
-  const newEspecialidad = {
-    id: Date.now(),
-    nombre: nameInput.value,
-  };
-
-  saveEspecialidad(newEspecialidad);
-  displayEspecialidades();
-  loadEspecialidadesOnSelect();
-
-  const modal = document.getElementById("crearEspecialidadModal");
-  const modalInstance = bootstrap.Modal.getInstance(modal);
-  modalInstance.hide();
-  nameInput.value = "";
-
-  Swal.fire(
-    "Especialidad creada correctamente",
-    "La especialidad ha sido creado con éxito",
-    "success"
-  );
-}
-
-/**
- * Función para eliminar un médico por su ID
- * @param {number} id - El ID del médico a eliminar
- */
 function deleteDoctor(id) {
   let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   doctors = doctors.filter((doctor) => doctor.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
 }
 
-function deleteEspecialidad(id) {
-  Swal.fire({
-    title: "¿Estás seguro de que quieres eliminar esta especialidad?",
-    text: "Esta acción no se puede deshacer",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Si, eliminar",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      let especialidades = JSON.parse(localStorage.getItem("especialidades"));
-      especialidades = especialidades.filter((esp) => esp.id !== parseInt(id));
-      localStorage.setItem("especialidades", JSON.stringify(especialidades));
-
-      displayEspecialidades();
-      loadEspecialidadesOnSelect();
-      Swal.fire({
-        title: "Especialidad eliminada correctamente",
-        icon: "success",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
-  });
-}
-
-/**
- * Función para precargar los datos del médico en el formulario de edición
- * @param {number} id - El ID del médico a editar
- */
 function loadDoctorForEditing(id) {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const doctorToEdit = doctors.find((doctor) => doctor.id === id);
@@ -214,10 +133,6 @@ function loadDoctorForEditing(id) {
   }
 }
 
-/**
- * Función para guardar los cambios de un médico editado
- * @param {Event} event - El evento del formulario
- */
 function handleEditFormSubmit(id) {
   const editedDoctor = {
     nombre: document.getElementById("edit-doctor-name").value,
@@ -252,6 +167,104 @@ function handleEditFormSubmit(id) {
   );
 }
 
+// --- FUNCIONES DE ESPECIALIDADES ---
+
+function displayEspecialidades() {
+  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+  const tableBody = document.getElementById("especialidades-table-body");
+  tableBody.innerHTML = "";
+
+  if (especialidades && especialidades.length > 0) {
+    especialidades.forEach((esp) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                <td>${esp.id}</td>
+                <td>${esp.nombre}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-esp-btn" data-id="${esp.id}">Eliminar</button>
+                    <button class="btn btn-warning btn-sm edit-esp-btn" data-bs-toggle="modal" data-bs-target="#editarEspecialidadModal" data-id="${esp.id}">Modificar</button>
+                </td>
+            `;
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function saveEspecialidad(newEspecialidad) {
+  const especialidades =
+    JSON.parse(localStorage.getItem("especialidades")) || [];
+  especialidades.push(newEspecialidad);
+  localStorage.setItem("especialidades", JSON.stringify(especialidades));
+}
+
+function handleEspecialidadFormSubmit(event) {
+  event.preventDefault();
+
+  const nameInput = document.getElementById("especialidad-name");
+
+  const newEspecialidad = {
+    id: getNextId("especialidades"),
+    nombre: nameInput.value,
+  };
+
+  saveEspecialidad(newEspecialidad);
+  displayEspecialidades();
+  loadEspecialidadesOnSelect();
+
+  const modal = document.getElementById("crearEspecialidadModal");
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  modalInstance.hide();
+  nameInput.value = "";
+
+  Swal.fire(
+    "Especialidad creada correctamente",
+    "La especialidad ha sido creado con éxito",
+    "success"
+  );
+}
+
+function deleteEspecialidad(id) {
+  Swal.fire({
+    title: "¿Estás seguro de que quieres eliminar esta especialidad?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let especialidades = JSON.parse(localStorage.getItem("especialidades"));
+      especialidades = especialidades.filter((esp) => esp.id !== parseInt(id));
+      localStorage.setItem("especialidades", JSON.stringify(especialidades));
+
+      displayEspecialidades();
+      loadEspecialidadesOnSelect();
+      Swal.fire({
+        title: "Especialidad eliminada correctamente",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  });
+}
+
+function editEspecialidad(id) {
+  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+
+  const input = document.getElementById("edit-especialidad-name");
+
+  const especialidadToEdit = especialidades.find(
+    (esp) => esp.id === parseInt(id)
+  );
+
+  if (especialidadToEdit) {
+    input.value = especialidadToEdit.nombre;
+  }
+}
+
 function handleEspecialidadEditFormSubmit(id) {
   const especialidades = JSON.parse(localStorage.getItem("especialidades"));
 
@@ -279,65 +292,255 @@ function handleEspecialidadEditFormSubmit(id) {
 
 function loadEspecialidadesOnSelect() {
   const selectSpecialty = document.getElementById("doctor-specialty");
+  const selectEditSpecialty = document.getElementById("edit-doctor-specialty");
   selectSpecialty.innerHTML = "";
+  selectEditSpecialty.innerHTML = "";
 
   const emptyOption = document.createElement("option");
-
   emptyOption.value = "Sin seleccionar";
   emptyOption.textContent = "Sin seleccionar";
-
   selectSpecialty.appendChild(emptyOption);
 
   const especialidades = JSON.parse(localStorage.getItem("especialidades"));
   especialidades.forEach((esp) => {
     const option = document.createElement("option");
-
     option.value = esp.nombre;
     option.textContent = esp.nombre;
-
     selectSpecialty.appendChild(option);
+    selectEditSpecialty.appendChild(option.cloneNode(true));
   });
 }
+
+// --- FUNCIONES DE OBRAS SOCIALES ---
+
+function displayObrasSociales() {
+  const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+  const tableBody = document.getElementById("obras-sociales-table-body");
+  tableBody.innerHTML = "";
+
+  if (obrasSociales && obrasSociales.length > 0) {
+    obrasSociales.forEach((os) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                <td>${os.id}</td>
+                <td>${os.nombre}</td>
+                <td>${os.descripcion}</td>
+                <td>${(os.porcentaje * 100).toFixed(0)}%</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-os-btn" data-id="${
+                      os.id
+                    }">Eliminar</button>
+                    <button class="btn btn-warning btn-sm edit-os-btn" data-bs-toggle="modal" data-bs-target="#editarObraSocialModal" data-id="${
+                      os.id
+                    }">Modificar</button>
+                </td>
+            `;
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function saveObraSocial(newObraSocial) {
+  const obrasSociales =
+    JSON.parse(localStorage.getItem("obras-sociales")) || [];
+  obrasSociales.push(newObraSocial);
+  localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
+}
+
+function handleObraSocialFormSubmit(event) {
+  event.preventDefault();
+
+  const nameInput = document.getElementById("obra-social-name");
+  const descInput = document.getElementById("obra-social-desc");
+  const pctInput = document.getElementById("obra-social-pct");
+
+  const newObraSocial = {
+    id: getNextId("obras-sociales"),
+    nombre: nameInput.value,
+    descripcion: descInput.value,
+    porcentaje: parseFloat(pctInput.value) / 100,
+  };
+
+  saveObraSocial(newObraSocial);
+  displayObrasSociales();
+  displayDoctors();
+
+  const modal = document.getElementById("crearObraSocialModal");
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  modalInstance.hide();
+  event.target.reset();
+
+  Swal.fire(
+    "Obra Social creada correctamente",
+    "La obra social ha sido creada con éxito",
+    "success"
+  );
+}
+
+function deleteObraSocial(id) {
+  Swal.fire({
+    title: "¿Estás seguro de que quieres eliminar esta obra social?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+      obrasSociales = obrasSociales.filter((os) => os.id !== parseInt(id));
+      localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
+
+      displayObrasSociales();
+      displayDoctors();
+      Swal.fire({
+        title: "Obra Social eliminada correctamente",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  });
+}
+
+function loadObraSocialForEditing(id) {
+  const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+  const osToEdit = obrasSociales.find((os) => os.id === parseInt(id));
+
+  if (osToEdit) {
+    document.getElementById("edit-obra-social-name").value = osToEdit.nombre;
+    document.getElementById("edit-obra-social-desc").value =
+      osToEdit.descripcion;
+    document.getElementById("edit-obra-social-pct").value = osToEdit.porcentaje * 100;
+  }
+}
+
+function handleEditObraSocialSubmit(id) {
+  const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+  const osIndex = obrasSociales.findIndex((os) => os.id === parseInt(id));
+
+  if (osIndex !== -1) {
+    obrasSociales[osIndex].nombre = document.getElementById(
+      "edit-obra-social-name"
+    ).value;
+    obrasSociales[osIndex].descripcion = document.getElementById(
+      "edit-obra-social-desc"
+    ).value;
+    obrasSociales[osIndex].porcentaje = parseFloat(
+      document.getElementById("edit-obra-social-pct").value
+    ) / 100;
+
+    localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
+  }
+
+  displayObrasSociales();
+  displayDoctors();
+
+  const modal = document.getElementById("editarObraSocialModal");
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  modalInstance.hide();
+
+  Swal.fire(
+    "Obra Social editada correctamente",
+    "La obra social ha sido editada con éxito",
+    "success"
+  );
+}
+
+// --- FUNCIONES DE RESERVAS ---
+
+function displayReservas() {
+  const reservas = JSON.parse(localStorage.getItem("reservas"));
+  const medicos = JSON.parse(localStorage.getItem("medicos_idw"));
+  const tableBody = document.getElementById("reservas-table-body");
+  tableBody.innerHTML = "";
+
+  if (reservas && reservas.length > 0) {
+    reservas.forEach((res) => {
+      const medico = medicos.find((m) => m.id === res.medicoId);
+      const medicoNombre = medico
+        ? `${medico.nombre} ${medico.apellido}`
+        : "Médico no encontrado";
+      const fecha = new Date(res.fechaHora).toLocaleString("es-AR");
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                <td>${res.id}</td>
+                <td>${res.nombrePaciente}</td>
+                <td>${res.documento}</td>
+                <td>${medicoNombre}</td>
+                <td>${fecha} hs.</td>
+                <td>$${res.valorTotal.toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-res-btn" data-id="${
+                      res.id
+                    }">Eliminar</button>
+                </td>
+            `;
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function deleteReserva(id) {
+  Swal.fire({
+    title: "¿Estás seguro de que quieres eliminar esta reserva?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let reservas = JSON.parse(localStorage.getItem("reservas"));
+      reservas = reservas.filter((res) => res.id !== parseInt(id));
+      localStorage.setItem("reservas", JSON.stringify(reservas));
+
+      displayReservas();
+      Swal.fire({
+        title: "Reserva eliminada correctamente",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  });
+}
+
+// --- EVENT LISTENERS ---
 
 document.addEventListener("DOMContentLoaded", () => {
   displayDoctors();
   displayEspecialidades();
+  displayObrasSociales();
+  displayReservas();
   loadEspecialidadesOnSelect();
 });
 
-// Obtener la referencia al formulario de creación y añadir el "listener"
-const doctorForm = document.getElementById("doctor-form");
-doctorForm.addEventListener("submit", handleFormSubmit);
+document.getElementById("doctor-form").addEventListener("submit", handleFormSubmit);
+document.getElementById("especialidad-form").addEventListener("submit", handleEspecialidadFormSubmit);
+document.getElementById("obra-social-form").addEventListener("submit", handleObraSocialFormSubmit);
 
-const especialidadForm = document.getElementById("especialidad-form");
-especialidadForm.addEventListener("submit", handleEspecialidadFormSubmit);
+document.getElementById("edit-doctor-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  handleEditFormSubmit(editDoctorId);
+});
 
-function editEspecialidad(id) {
-  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+document.getElementById("edit-especialidad-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  handleEspecialidadEditFormSubmit(editEspecialidadId);
+});
 
-  const input = document.getElementById("edit-especialidad-name");
+document.getElementById("edit-obra-social-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  handleEditObraSocialSubmit(editObraSocialId);
+});
 
-  const especialidadToEditIndex = especialidades.findIndex(
-    (esp) => esp.id === parseInt(id)
-  );
-
-  if (especialidadToEditIndex !== -1) {
-    input.value = especialidades[especialidadToEditIndex].nombre;
-  }
-}
-
-// Manejar clics en los botones de la tabla
-document
-  .getElementById("especialidades-table-body")
-  .addEventListener("click", (event) => {
-    if (event.target.classList.contains("edit-btn")) {
-      editEspecialidadId = event.target.getAttribute("data-id");
-      editEspecialidad(editEspecialidadId);
-    }
-  });
-document
-  .getElementById("medicos-table-body")
-  .addEventListener("click", (event) => {
+document.getElementById("medicos-table-body").addEventListener("click", (event) => {
     if (event.target.classList.contains("delete-btn")) {
       const doctorId = parseInt(event.target.getAttribute("data-id"));
       Swal.fire({
@@ -366,25 +569,33 @@ document
       editDoctorId = parseInt(event.target.getAttribute("data-id"));
       loadDoctorForEditing(editDoctorId);
     }
-  });
-
-// Obtener la referencia al formulario de edición y añadir el listener
-const editForm = document.getElementById("edit-doctor-form");
-editForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  handleEditFormSubmit(editDoctorId);
 });
 
-const editEspecialidadForm = document.getElementById("edit-especialidad-form");
-editEspecialidadForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  handleEspecialidadEditFormSubmit(editEspecialidadId);
+document.getElementById("especialidades-table-body").addEventListener("click", (event) => {
+    if (event.target.classList.contains("edit-esp-btn")) {
+      editEspecialidadId = event.target.getAttribute("data-id");
+      editEspecialidad(editEspecialidadId);
+    }
+    if (event.target.classList.contains("delete-esp-btn")) {
+      const espId = event.target.getAttribute("data-id");
+      deleteEspecialidad(espId);
+    }
 });
 
-// Añadir el listener al botón de cancelar para ocultar el formulario
-document.getElementById("cancel-edit-btn").addEventListener("click", () => {
-  document.getElementById("edit-form-section").style.display = "none";
-  document.getElementById("doctor-form").parentElement.style.display = "block";
+document.getElementById("obras-sociales-table-body").addEventListener("click", (event) => {
+    if (event.target.classList.contains("edit-os-btn")) {
+      editObraSocialId = event.target.getAttribute("data-id");
+      loadObraSocialForEditing(editObraSocialId);
+    }
+    if (event.target.classList.contains("delete-os-btn")) {
+      const osId = event.target.getAttribute("data-id");
+      deleteObraSocial(osId);
+    }
+});
+
+document.getElementById("reservas-table-body").addEventListener("click", (event) => {
+    if (event.target.classList.contains("delete-res-btn")) {
+      const resId = event.target.getAttribute("data-id");
+      deleteReserva(resId);
+    }
 });
