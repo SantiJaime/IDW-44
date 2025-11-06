@@ -1,5 +1,5 @@
 function logOut() {
-  localStorage.removeItem("admin");
+  sessionStorage.removeItem("token");
 
   const pathName = window.location.pathname;
   const isInsideHtmlFolder = pathName.includes("/html/");
@@ -43,7 +43,7 @@ function renderNavbar() {
 
   const isActive = (fileName) => (pathName.includes(fileName) ? " active" : "");
 
-  const isLoggedIn = JSON.parse(localStorage.getItem("admin"));
+  const isLoggedIn = sessionStorage.getItem("token");
 
   const adminLink = isLoggedIn
     ? `<li class="nav-item">

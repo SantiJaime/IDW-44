@@ -91,36 +91,43 @@ const obrasSociales = [
     id: 1,
     nombre: "OSDE",
     descripcion: "Cobertura y planes ofrecidos por OSDE.",
+    porcentaje: 0.40
   },
   {
     id: 2,
     nombre: "OSECAC",
     descripcion: "Cobertura y planes ofrecidos por OSECAC.",
+    porcentaje: 0.30
   },
   {
     id: 3,
     nombre: "SWISS MEDICAL",
     descripcion: "Cobertura y planes ofrecidos por SWISS MEDICAL.",
+    porcentaje: 0.50
   },
   {
     id: 4,
     nombre: "GALENO",
     descripcion: "Cobertura y planes ofrecidos por GALENO.",
+    porcentaje: 0.35
   },
   {
     id: 5,
     nombre: "SANCOR SALUD",
     descripcion: "Cobertura y planes ofrecidos por SANCOR SALUD.",
+    porcentaje: 0.25
   },
   {
     id: 6,
     nombre: "OSPE",
     descripcion: "Cobertura y planes ofrecidos por OSPE.",
+    porcentaje: 0.20
   },
   {
     id: 7,
     nombre: "UPCN",
     descripcion: "Cobertura y planes ofrecidos por UPCN.",
+    porcentaje: 0.30
   },
 ];
 
@@ -142,24 +149,17 @@ function renderObrasSociales() {
 }
 
 function initializeData() {
-  if (!localStorage.getItem("medicos_idw")) {
-    localStorage.setItem("medicos_idw", JSON.stringify(initialDoctors));
-    console.log("Datos de médicos iniciales guardados en LocalStorage.");
-  }
-  if (!localStorage.getItem("especialidades")) {
-    localStorage.setItem("especialidades", JSON.stringify(especialidades));
-    console.log("Datos de especialidades iniciales guardados en LocalStorage.");
-  }
-  if(!localStorage.getItem("obras-sociales")) {
-    localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
-    console.log("Datos de obras sociales iniciales guardados en LocalStorage.");
-  }
-  console.log("Los datos de médicos ya existen en LocalStorage.");
+  localStorage.setItem("medicos_idw", JSON.stringify(initialDoctors));
+  localStorage.setItem("especialidades", JSON.stringify(especialidades));
+  localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
+  console.log("Datos iniciales forzados en LocalStorage.");
 }
 
 function displayDoctors() {
   const doctors = JSON.parse(localStorage.getItem("medicos_idw"));
   const doctorsContainer = document.getElementById("doctors-container");
+
+  if (!doctorsContainer) return;
 
   doctorsContainer.innerHTML = "";
 
@@ -169,7 +169,7 @@ function displayDoctors() {
       card.className =
         "col-lg-3 col-md-6 col-sm-12 py-2 d-flex justify-content-center";
       card.innerHTML = `
-                <div class="card" style="width: 20rem">
+                <div classcard" style="width: 20rem">
                     <img src="${doctor.imagen}" class="card-img-top" alt="${doctor.nombre} ${doctor.apellido}" />
                     <div class="card-body">
                         <h5 class="card-title">Dr(a). ${doctor.nombre} ${doctor.apellido}</h5>

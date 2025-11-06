@@ -17,6 +17,11 @@
     <header id="navbar-container"></header>
     <main>
       <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-end mb-3">
+          <a href="usuarios.html" class="btn btn-info"
+            >Ir a Gestión de Usuarios</a
+          >
+        </div>
         <div class="d-flex justify-content-between">
           <h2 class="text-center">Médicos</h2>
           <button
@@ -47,6 +52,7 @@
           </table>
         </div>
       </section>
+
       <section class="container-fluid mt-3">
         <div class="d-flex justify-content-between">
           <h2 class="text-center">Especialidades médicas</h2>
@@ -73,6 +79,59 @@
           </table>
         </div>
       </section>
+
+      <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-between">
+          <h2 class="text-center">Obras Sociales</h2>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearObraSocialModal"
+          >
+            Crear nueva Obra Social
+          </button>
+        </div>
+        <hr class="separador" />
+        <div class="table-responsive">
+          <table class="table table-striped table-hover text-center">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Porcentaje Descuento</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="obras-sociales-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-between">
+          <h2 class="text-center">Reservas</h2>
+        </div>
+        <hr class="separador" />
+        <div class="table-responsive">
+          <table class="table table-striped table-hover text-center">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Paciente</th>
+                <th scope="col">Documento</th>
+                <th scope="col">Médico</th>
+                <th scope="col">Fecha y Hora</th>
+                <th scope="col">Valor Total</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="reservas-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
       <div
         class="modal fade"
         id="crearMedicoModal"
@@ -162,7 +221,7 @@
           </div>
         </div>
       </div>
-            <div
+      <div
         class="modal fade"
         id="editarMedicoModal"
         tabindex="-1"
@@ -251,6 +310,7 @@
           </div>
         </div>
       </div>
+
       <div
         class="modal fade"
         id="crearEspecialidadModal"
@@ -322,6 +382,135 @@
                     type="text"
                     class="form-control"
                     id="edit-especialidad-name"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Guardar cambios
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="crearObraSocialModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Crear nueva Obra Social
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="obra-social-form">
+                <div class="mb-3">
+                  <label for="obra-social-name" class="form-label"
+                    >Nombre:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="obra-social-name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="obra-social-desc" class="form-label"
+                    >Descripción:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="obra-social-desc"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="obra-social-pct" class="form-label"
+                    >Porcentaje (Ej: 30 para 30%):</label
+                  >
+                  <input
+                    type="number"
+                    step="1"
+                    class="form-control"
+                    id="obra-social-pct"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Agregar Obra Social
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="modal fade"
+        id="editarObraSocialModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Editar Obra Social
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-obra-social-form">
+                <div class="mb-3">
+                  <label for="edit-obra-social-name" class="form-label"
+                    >Nombre:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-obra-social-name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="edit-obra-social-desc" class="form-label"
+                    >Descripción:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-obra-social-desc"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="edit-obra-social-pct" class="form-label"
+                    >Porcentaje (Ej: 30 para 30%):</label
+                  >
+                  <input
+                    type="number"
+                    step="1"
+                    class="form-control"
+                    id="edit-obra-social-pct"
                     required
                   />
                 </div>

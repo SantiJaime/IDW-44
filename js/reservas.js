@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const medicos = JSON.parse(localStorage.getItem("medicos_idw"));
+  const medicos = JSON.parse(localStorage.getItem("medicos_idw"));
+  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+  const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
 
   const buttonCalcularMonto = document.getElementById("button-calcular-monto");
   const reservaForm = document.getElementById("reserva-form");
@@ -16,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     especialidades.forEach((esp) => {
       const option = document.createElement("option");
       option.value = esp.id;
-      option.textContent = esp.Nombre;
+      option.textContent = esp.nombre;
       selectEspecialidad.appendChild(option);
     });
   }
@@ -44,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = doc.id;
         option.textContent = `${doc.nombre} ${doc.apellido}`;
         selectMedico.appendChild(option);
-        medicoSeleccionado = doc;
       });
       selectMedico.disabled = false;
     } else {
@@ -61,13 +62,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const medico = medicos.find((doc) => doc.id === parseInt(medicoId));
     const medicoRecibeObraSocial = medico.obrasSociales.find((os) => os === parseInt(obraSocialId));
+    
+    let descuentoPct = 0;
 
-    const descuentoPct = medicoRecibeObraSocial ? 0.3 : 0;
+    if (medicoRecibeObraSocial) {
+      const obraSocial = obrasSociales.find((os) => os.id === parseInt(obraSocialId));
+      descuentoPct = obraSocial.porcentaje;
+    }
+    
     const valorBase = parseFloat(medico.valorConsulta);
-
     const valorConDescuento = valorBase - (valorBase * descuentoPct);
 
     return valorConDescuento;
+  }
+
+  function saveReserva(reserva) {
+    const reservas = JSON.parse(localStorage.getItem("reservas")) || [];
+    reservas.push(reserva);
+    localStorage.setItem("reservas", JSON.stringify(reservas));
   }
 
   function handleSubmit(event) {
@@ -104,6 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
       fechaHora: fechaHora,
       valorTotal: valorTotal,
     };
+    
+    saveReserva(nuevaReserva);
 
     const medicoTexto = selectMedico.options[selectMedico.selectedIndex].text;
     const fechaFormateada = new Date(fechaHora).toLocaleString("es-AR", {
@@ -125,9 +139,8 @@ document.addEventListener("DOMContentLoaded", () => {
       confirmButtonText: "Aceptar",
     });
 
-    console.log("Objeto de Reserva creado:", nuevaReserva);
     reservaForm.reset();
-    valorTotalDisplay.className = "d-none";
+    valorTotalDisplay.textContent = "";
 
     selectMedico.disabled = true;
     selectMedico.innerHTML =
@@ -145,6 +158,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   buttonCalcularMonto.addEventListener("click", () => {
     const valorTotal = calcularYMostrarTotal(selectMedico.value, selectObraSocial.value);
-    valorTotalDisplay.textContent = `$${valorTotal.toFixed(2)}`;
+    if(valorTotal){
+      valorTotalDisplay.textContent = `$${valorTotal.toFixed(2)}`;
+    }
   });
 });
