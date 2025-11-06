@@ -22,7 +22,9 @@ function displayDoctors() {
                 <td>${doctor.obrasSociales.map(
                   (id) => obrasSociales.find((os) => os.id === id).nombre
                 )}</td>
-                <td><img src="${doctor.imagen}" alt="${doctor.nombre}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
+                <td><img src="${doctor.imagen}" alt="${
+        doctor.nombre
+      }" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
                 <td>
                     <button class="btn btn-danger btn-sm delete-btn" data-id="${
                       doctor.id
@@ -50,6 +52,7 @@ function handleFormSubmit(event) {
   const lastNameInput = document.getElementById("doctor-lastname");
   const specialtyInput = document.getElementById("doctor-specialty");
   const matriculaInput = document.getElementById("doctor-matricula");
+  const valorConsultaInput = document.getElementById("doctor-valor-consulta");
   const imageInput = document.getElementById("doctor-image");
 
   const newDoctor = {
@@ -58,7 +61,9 @@ function handleFormSubmit(event) {
     apellido: lastNameInput.value,
     especialidad: specialtyInput.value,
     matricula: matriculaInput.value,
+    valorConsulta: valorConsultaInput.value,
     imagen: imageInput.value,
+    obrasSociales: [1, 3],
   };
 
   saveDoctor(newDoctor);
@@ -296,6 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
   displayEspecialidades();
   loadEspecialidadesOnSelect();
 });
+
 document
   .getElementById("especialidades-table-body")
   .addEventListener("click", (event) => {
@@ -304,6 +310,7 @@ document
       editEspecialidad(editEspecialidadId);
     }
   });
+  
 document
   .getElementById("medicos-table-body")
   .addEventListener("click", (event) => {
