@@ -1,8 +1,21 @@
+if (!sessionStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
+
 const STORAGE_KEY = "medicos_idw";
 let editEspecialidadId = null;
 let editDoctorId = null;
+let editObraSocialId = null;
 
-// Médicos
+function getNextId(storageKey) {
+  const items = JSON.parse(localStorage.getItem(storageKey)) || [];
+  if (items.length === 0) return 1;
+  const maxId = items.reduce((max, item) => (item.id > max ? item.id : max), 0);
+  return maxId + 1;
+}
+
+// --- FUNCIONES DE MEDICOS ---
+
 function displayDoctors() {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
@@ -57,7 +70,7 @@ function handleFormSubmit(event) {
   const lastNameInput = document.getElementById("doctor-lastname");
   const specialtyInput = document.getElementById("doctor-specialty");
   const matriculaInput = document.getElementById("doctor-matricula");
-  const valorConsultaInput = document.getElementById("doctor-valor-consulta");
+  const valorInput = document.getElementById("doctor-valor-consulta");
   const imageInput = document.getElementById("doctor-image");
 
   const newDoctor = {
@@ -66,9 +79,9 @@ function handleFormSubmit(event) {
     apellido: lastNameInput.value,
     especialidad: specialtyInput.value,
     matricula: matriculaInput.value,
-    valorConsulta: valorConsultaInput.value,
+    valorConsulta: valorInput.value,
     imagen: imageInput.value,
-    obrasSociales: [1, 3],
+    obrasSociales: [],
   };
 
   saveDoctor(newDoctor);
@@ -154,7 +167,8 @@ function handleEditFormSubmit(id) {
   );
 }
 
-// Especialidades
+// --- FUNCIONES DE ESPECIALIDADES ---
+
 function displayEspecialidades() {
   const especialidades = JSON.parse(localStorage.getItem("especialidades"));
   const tableBody = document.getElementById("especialidades-table-body");
@@ -167,8 +181,8 @@ function displayEspecialidades() {
                 <td>${esp.id}</td>
                 <td>${esp.nombre}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" onclick="deleteEspecialidad(${esp.id})">Eliminar</button>
-                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editarEspecialidadModal" data-id="${esp.id}">Modificar</button>
+                    <button class="btn btn-danger btn-sm delete-esp-btn" data-id="${esp.id}">Eliminar</button>
+                    <button class="btn btn-warning btn-sm edit-esp-btn" data-bs-toggle="modal" data-bs-target="#editarEspecialidadModal" data-id="${esp.id}">Modificar</button>
                 </td>
             `;
       tableBody.appendChild(row);
@@ -189,7 +203,7 @@ function handleEspecialidadFormSubmit(event) {
   const nameInput = document.getElementById("especialidad-name");
 
   const newEspecialidad = {
-    id: Date.now(),
+    id: getNextId("especialidades"),
     nombre: nameInput.value,
   };
 
@@ -235,6 +249,20 @@ function deleteEspecialidad(id) {
       });
     }
   });
+}
+
+function editEspecialidad(id) {
+  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+
+  const input = document.getElementById("edit-especialidad-name");
+
+  const especialidadToEdit = especialidades.find(
+    (esp) => esp.id === parseInt(id)
+  );
+
+  if (especialidadToEdit) {
+    input.value = especialidadToEdit.nombre;
+  }
 }
 
 function handleEspecialidadEditFormSubmit(id) {
@@ -283,8 +311,87 @@ function loadEspecialidadesOnSelect() {
   });
 }
 
-function editEspecialidad(id) {
-  const especialidades = JSON.parse(localStorage.getItem("especialidades"));
+// --- FUNCIONES DE OBRAS SOCIALES ---
+
+function displayObrasSociales() {
+  const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+  const tableBody = document.getElementById("obras-sociales-table-body");
+  tableBody.innerHTML = "";
+
+  if (obrasSociales && obrasSociales.length > 0) {
+    obrasSociales.forEach((os) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                <td>${os.id}</td>
+                <td>${os.nombre}</td>
+                <td>${os.descripcion}</td>
+                <td>${(os.porcentaje * 100).toFixed(0)}%</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-os-btn" data-id="${
+                      os.id
+                    }">Eliminar</button>
+                    <button class="btn btn-warning btn-sm edit-os-btn" data-bs-toggle="modal" data-bs-target="#editarObraSocialModal" data-id="${
+                      os.id
+                    }">Modificar</button>
+                </td>
+            `;
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function saveObraSocial(newObraSocial) {
+  const obrasSociales =
+    JSON.parse(localStorage.getItem("obras-sociales")) || [];
+  obrasSociales.push(newObraSocial);
+  localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
+}
+
+function handleObraSocialFormSubmit(event) {
+  event.preventDefault();
+
+  const nameInput = document.getElementById("obra-social-name");
+  const descInput = document.getElementById("obra-social-desc");
+  const pctInput = document.getElementById("obra-social-pct");
+
+  const newObraSocial = {
+    id: getNextId("obras-sociales"),
+    nombre: nameInput.value,
+    descripcion: descInput.value,
+    porcentaje: parseFloat(pctInput.value) / 100,
+  };
+
+  saveObraSocial(newObraSocial);
+  displayObrasSociales();
+  displayDoctors();
+
+  const modal = document.getElementById("crearObraSocialModal");
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  modalInstance.hide();
+  event.target.reset();
+
+  Swal.fire(
+    "Obra Social creada correctamente",
+    "La obra social ha sido creada con éxito",
+    "success"
+  );
+}
+
+function deleteObraSocial(id) {
+  Swal.fire({
+    title: "¿Estás seguro de que quieres eliminar esta obra social?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+      obrasSociales = obrasSociales.filter((os) => os.id !== parseInt(id));
+      localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
 
       displayObrasSociales();
       displayDoctors();
@@ -377,25 +484,63 @@ function displayReservas() {
   }
 }
 
-// Listeners
+function deleteReserva(id) {
+  Swal.fire({
+    title: "¿Estás seguro de que quieres eliminar esta reserva?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let reservas = JSON.parse(localStorage.getItem("reservas"));
+      reservas = reservas.filter((res) => res.id !== parseInt(id));
+      localStorage.setItem("reservas", JSON.stringify(reservas));
+
+      displayReservas();
+      Swal.fire({
+        title: "Reserva eliminada correctamente",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  });
+}
+
+// --- EVENT LISTENERS ---
+
 document.addEventListener("DOMContentLoaded", () => {
   displayDoctors();
   displayEspecialidades();
+  displayObrasSociales();
+  displayReservas();
   loadEspecialidadesOnSelect();
 });
 
-document
-  .getElementById("especialidades-table-body")
-  .addEventListener("click", (event) => {
-    if (event.target.classList.contains("edit-btn")) {
-      editEspecialidadId = event.target.getAttribute("data-id");
-      editEspecialidad(editEspecialidadId);
-    }
-  });
-  
-document
-  .getElementById("medicos-table-body")
-  .addEventListener("click", (event) => {
+document.getElementById("doctor-form").addEventListener("submit", handleFormSubmit);
+document.getElementById("especialidad-form").addEventListener("submit", handleEspecialidadFormSubmit);
+document.getElementById("obra-social-form").addEventListener("submit", handleObraSocialFormSubmit);
+
+document.getElementById("edit-doctor-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  handleEditFormSubmit(editDoctorId);
+});
+
+document.getElementById("edit-especialidad-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  handleEspecialidadEditFormSubmit(editEspecialidadId);
+});
+
+document.getElementById("edit-obra-social-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  handleEditObraSocialSubmit(editObraSocialId);
+});
+
+document.getElementById("medicos-table-body").addEventListener("click", (event) => {
     if (event.target.classList.contains("delete-btn")) {
       const doctorId = parseInt(event.target.getAttribute("data-id"));
       Swal.fire({
@@ -424,13 +569,6 @@ document
       editDoctorId = parseInt(event.target.getAttribute("data-id"));
       loadDoctorForEditing(editDoctorId);
     }
-  });
-
-const editForm = document.getElementById("edit-doctor-form");
-editForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  handleEditFormSubmit(editDoctorId);
 });
 
 document.getElementById("especialidades-table-body").addEventListener("click", (event) => {
@@ -455,8 +593,9 @@ document.getElementById("obras-sociales-table-body").addEventListener("click", (
     }
 });
 
-const doctorForm = document.getElementById("doctor-form");
-doctorForm.addEventListener("submit", handleFormSubmit);
-
-const especialidadForm = document.getElementById("especialidad-form");
-especialidadForm.addEventListener("submit", handleEspecialidadFormSubmit);
+document.getElementById("reservas-table-body").addEventListener("click", (event) => {
+    if (event.target.classList.contains("delete-res-btn")) {
+      const resId = event.target.getAttribute("data-id");
+      deleteReserva(resId);
+    }
+});
