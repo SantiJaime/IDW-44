@@ -10,6 +10,7 @@ const initialDoctors = [
     descripcion: "Especialista en Cardiología con 12 años de experiencia.",
     matricula: 1234,
     especialidadId: 1,
+    horarios: [],
   },
   {
     id: 2,
@@ -23,6 +24,7 @@ const initialDoctors = [
       "Pediatra dedicada al cuidado infantil y seguimiento de neonatos.",
     matricula: 2187,
     especialidadId: 2,
+    horarios: [],
   },
   {
     id: 3,
@@ -35,6 +37,7 @@ const initialDoctors = [
     descripcion: "Neuróloga enfocada en trastornos del movimiento y migrañas.",
     matricula: 3207,
     especialidadId: 3,
+    horarios: [],
   },
   {
     id: 4,
@@ -48,6 +51,7 @@ const initialDoctors = [
       "Traumatólogo experto en lesiones deportivas y cirugía de rodilla.",
     matricula: 7950,
     especialidadId: 4,
+    horarios: [],
   },
   {
     id: 5,
@@ -60,6 +64,7 @@ const initialDoctors = [
     descripcion: "Radiólogo especializado en diagnósticos",
     matricula: 6541,
     especialidadId: 5,
+    horarios: [],
   },
 ];
 

@@ -10,71 +10,151 @@
     />
     <link rel="stylesheet" href="../css/navbar.css" />
     <link rel="stylesheet" href="../css/index.css" />
+    <style>
+      .turno-slot {
+        cursor: pointer;
+        padding: 8px 12px;
+        border: 1px solid #0d6efd;
+        border-radius: 4px;
+        color: #0d6efd;
+        margin: 4px;
+        font-size: 0.9rem;
+      }
+      .turno-slot:hover {
+        background-color: #e0e0e0;
+      }
+      .turno-slot.selected {
+        background-color: #0d6efd;
+        color: white;
+      }
+      .turno-slot.disabled {
+        background-color: #f8f9fa;
+        color: #adb5bd;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+      }
+      .turno-dia-grupo {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+      }
+      /* --- NUEVO ESTILO --- */
+      .turno-slots-container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    </style>
   </head>
   <body class="bg-light">
     <header id="navbar-container"></header>
     <main>
-<div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card shadow-sm">
-          <div class="card-body p-4">
-            <h2 class="card-title text-center mb-4">Solicitar Reserva</h2>
-            <form id="reserva-form">
-              <div class="row mb-3">
-                <div class="col-md-8">
-                  <label for="nombre-paciente" class="form-label">Apellido y nombre del paciente</label>
-                  <input type="text" class="form-control" id="nombre-paciente" required>
-                </div>
-                <div class="col-md-4">
-                  <label for="documento" class="form-label">Documento</label>
-                  <input type="text" class="form-control" id="documento" required>
-                </div>
-              </div>
+      <div class="container mt-5">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card shadow-sm">
+              <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Solicitar Reserva</h2>
+                <form id="reserva-form">
+                  <div class="row mb-3">
+                    <div class="col-md-8">
+                      <label for="nombre-paciente" class="form-label"
+                        >Apellido y nombre del paciente</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nombre-paciente"
+                        required
+                      />
+                    </div>
+                    <div class="col-md-4">
+                      <label for="documento" class="form-label">Documento</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="documento"
+                        required
+                      />
+                    </div>
+                  </div>
 
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="especialidad" class="form-label">Especialidad</label>
-                  <select class="form-select" id="especialidad" required>
-                    <option value="" disabled selected>Seleccione una especialidad...</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                  <label for="medico" class="form-label">Médico</label>
-                  <select class="form-select" id="medico" required disabled>
-                    <option value="" disabled selected>Seleccione un médico...</option>
-                    </select>
-                </div>
-              </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="especialidad" class="form-label"
+                        >Especialidad</label
+                      >
+                      <select class="form-select" id="especialidad" required>
+                        <option value="" disabled selected>
+                          Seleccione una especialidad...
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="medico" class="form-label">Médico</label>
+                      <select class="form-select" id="medico" required disabled>
+                        <option value="" disabled selected>
+                          Seleccione un médico...
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="row mb-3">
+                     <div class="col-md-6">
+                      <label for="obra-social" class="form-label"
+                        >Obra social</label
+                      >
+                      <select class="form-select" id="obra-social" required>
+                        <option value="" disabled selected>
+                          Seleccione una opción...
+                        </option>
+                      </select>
+                    </div>
+                     <div class="col-md-6">
+                         <label class="form-label">Monto a Pagar</label>
+                         <div class="d-flex">
+                            <button
+                              class="btn btn-success"
+                              type="button"
+                              id="button-calcular-monto"
+                            >
+                              Calcular
+                            </button>
+                            <p id="valor-total-display" class="fs-5 fw-bold m-0 ms-3"></p>
+                         </div>
+                    </div>
+                  </div>
 
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="fecha-hora" class="form-label">Fecha y Hora</label>
-                  <input type="datetime-local" class="form-control" id="fecha-hora" required>
-                </div>
-                <div class="col-md-6">
-                  <label for="obra-social" class="form-label">Obra social</label>
-                  <select class="form-select" id="obra-social" required>
-                    <option value="" disabled selected>Seleccione una opción...</option>
-                    </select>
-                </div>
-              </div>
+                  <hr class="my-4">
 
-              <div class="text-center mt-4">
-                <button class="btn btn-success" type="button" id="button-calcular-monto">Calcular monto a pagar</button>
-                <p id="valor-total-display" class="mt-2"></p>
-              </div>
+                  <div class="mb-3">
+                    <label class="form-label fs-5"
+                      >Próximos Turnos Disponibles</label
+                    >
+                    <div
+                      id="turnos-container"
+                      class="p-2 border rounded"
+                      style="min-height: 100px; max-height: 300px; overflow-y: auto;"
+                    >
+                      <small class="text-muted"
+                        >Seleccione un médico para ver sus próximos turnos
+                        disponibles...</small
+                      >
+                    </div>
+                  </div>
 
-              <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">Confirmar reserva</button>
+                  <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                      Confirmar reserva
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
-
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
     </main>
     <footer>
       <div class="row w-100 align-items-center">

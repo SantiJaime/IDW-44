@@ -221,6 +221,7 @@
           </div>
         </div>
       </div>
+      
       <div
         class="modal fade"
         id="editarMedicoModal"
@@ -228,8 +229,7 @@
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog">
-          <div class="modal-content">
+        <div class="modal-dialog modal-lg"> <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="exampleModalLabel">
                 Editar médico
@@ -243,74 +243,127 @@
             </div>
             <div class="modal-body">
               <form id="edit-doctor-form">
-                <div class="mb-3">
-                  <label for="edit-doctor-name" class="form-label">Nombre:</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="edit-doctor-name"
-                    required
-                  />
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-name" class="form-label">Nombre:</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="edit-doctor-name"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-lastname" class="form-label"
+                        >Apellido:</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="edit-doctor-lastname"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="edit-doctor-lastname" class="form-label"
-                    >Apellido:</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="edit-doctor-lastname"
-                    required
-                  />
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-matricula" class="form-label"
+                        >Matricula profesional:</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="edit-doctor-matricula"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-valor-consulta" class="form-label"
+                        >Valor de consulta:</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="edit-doctor-valor-consulta"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="edit-doctor-matricula" class="form-label"
-                    >Matricula profesional:</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="edit-doctor-matricula"
-                    required
-                  />
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-specialty" class="form-label"
+                        >Especialidad:</label
+                      >
+                      <select class="form-select" id="edit-doctor-specialty"></select>
+                    </div>
+                  </div>
+                   <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-image" class="form-label"
+                        >URL de la imagen:</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="edit-doctor-image"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="edit-doctor-valor-consulta" class="form-label"
-                    >Valor de consulta:</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="edit-doctor-valor-consulta"
-                    required
-                  />
+                
+                <hr>
+
+                <h5 class="mt-4">Gestión de Horarios</h5>
+                <div id="horarios-container">
+                  </div>
+                
+                <div class="row g-3 align-items-center mt-2 p-2 border rounded">
+                  <div class="col-md-3">
+                    <label for="horario-dia" class="form-label">Día</label>
+                    <select id="horario-dia" class="form-select">
+                      <option value="Lunes">Lunes</option>
+                      <option value="Martes">Martes</option>
+                      <option value="Miércoles">Miércoles</option>
+                      <option value="Jueves">Jueves</option>
+                      <option value="Viernes">Viernes</option>
+                      <option value="Sábado">Sábado</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="horario-inicio" class="form-label">Inicio (HH:mm)</label>
+                    <input type="time" id="horario-inicio" class="form-control" step="1800">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="horario-fin" class="form-label">Fin (HH:mm)</label>
+                    <input type="time" id="horario-fin" class="form-control" step="1800">
+                  </div>
+                  <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-success w-100" id="btn-agregar-horario">Agregar</button>
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="edit-doctor-specialty" class="form-label"
-                    >Especialidad:</label
-                  >
-                  <select class="form-select" id="edit-doctor-specialty"></select>
-                </div>
-                <div class="mb-3">
-                  <label for="edit-doctor-image" class="form-label"
-                    >URL de la imagen:</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="edit-doctor-image"
-                    required
-                  />
-                </div>
-                <button type="submit" class="btn btn-primary w-100">
-                  Guardar cambios
+                
+                <hr class="mt-4">
+
+                <button type="submit" class="btn btn-primary w-100 mt-3">
+                  Guardar Cambios
                 </button>
               </form>
             </div>
           </div>
         </div>
       </div>
-
       <div
         class="modal fade"
         id="crearEspecialidadModal"

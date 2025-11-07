@@ -82,6 +82,7 @@ function handleFormSubmit(event) {
     valorConsulta: valorInput.value,
     imagen: imageInput.value,
     obrasSociales: [],
+    horarios: [],
   };
 
   saveDoctor(newDoctor);
@@ -108,7 +109,7 @@ function deleteDoctor(id) {
 
 function loadDoctorForEditing(id) {
   const doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  const doctorToEdit = doctors.find((doctor) => doctor.id === id);
+  const doctorToEdit = doctors.find((doctor) => doctor.id === parseInt(id));
   const especialidades = JSON.parse(localStorage.getItem("especialidades"));
 
   if (doctorToEdit) {
@@ -130,11 +131,13 @@ function loadDoctorForEditing(id) {
       select.add(option);
     });
     select.value = doctorToEdit.especialidad;
+    
+    renderHorariosList(doctorToEdit.horarios || []);
   }
 }
 
 function handleEditFormSubmit(id) {
-  const editedDoctor = {
+  const editedDoctorData = {
     nombre: document.getElementById("edit-doctor-name").value,
     apellido: document.getElementById("edit-doctor-lastname").value,
     especialidad: document.getElementById("edit-doctor-specialty").value,
@@ -145,12 +148,16 @@ function handleEditFormSubmit(id) {
 
   let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const doctorIndex = doctors.findIndex((doctor) => doctor.id === parseInt(id));
+  
   if (doctorIndex !== -1) {
-    editedDoctor.obrasSociales = doctors[doctorIndex].obrasSociales;
-    editedDoctor.id = doctors[doctorIndex].id;
-
-    doctors[doctorIndex] = editedDoctor;
-
+    const originalDoctor = doctors[doctorIndex];
+    
+    const updatedDoctor = {
+        ...originalDoctor,
+        ...editedDoctorData,
+    };
+    
+    doctors[doctorIndex] = updatedDoctor;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
   }
 
@@ -162,10 +169,79 @@ function handleEditFormSubmit(id) {
 
   Swal.fire(
     "Médico editado correctamente",
-    "El médico ha sido editado con éxito",
+    "Los datos del médico han sido editados con éxito",
     "success"
   );
 }
+
+// --- NUEVAS FUNCIONES DE HORARIOS ---
+
+function renderHorariosList(horarios) {
+    const container = document.getElementById("horarios-container");
+    container.innerHTML = "";
+    
+    if (!horarios || horarios.length === 0) {
+        container.innerHTML = "<p class='text-muted'>No hay horarios cargados para este médico.</p>";
+        return;
+    }
+
+    horarios.forEach(horario => {
+        const horarioEl = document.createElement("div");
+        horarioEl.className = "d-flex justify-content-between align-items-center mb-2 p-2 border rounded";
+        horarioEl.innerHTML = `
+            <span><strong>${horario.dia}</strong>: ${horario.inicio} - ${horario.fin}</span>
+            <button type="button" class="btn btn-danger btn-sm btn-eliminar-horario" data-horario-id="${horario.id}">Eliminar</button>
+        `;
+        container.appendChild(horarioEl);
+    });
+}
+
+function handleAgregarHorario() {
+    const dia = document.getElementById("horario-dia").value;
+    const inicio = document.getElementById("horario-inicio").value;
+    const fin = document.getElementById("horario-fin").value;
+
+    if (!inicio || !fin) {
+        Swal.fire("Error", "Debe completar la hora de inicio y fin", "error");
+        return;
+    }
+
+    const newHorario = {
+        id: Date.now(),
+        dia,
+        inicio,
+        fin
+    };
+
+    let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const doctorIndex = doctors.findIndex(doc => doc.id === parseInt(editDoctorId));
+
+    if (doctorIndex !== -1) {
+        doctors[doctorIndex].horarios.push(newHorario);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
+        renderHorariosList(doctors[doctorIndex].horarios);
+    }
+    
+    document.getElementById("horario-inicio").value = "";
+    document.getElementById("horario-fin").value = "";
+}
+
+function handleEliminarHorario(evento) {
+    if (!evento.target.classList.contains("btn-eliminar-horario")) {
+        return;
+    }
+    
+    const horarioId = parseInt(evento.target.dataset.horarioId);
+    let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const doctorIndex = doctors.findIndex(doc => doc.id === parseInt(editDoctorId));
+
+    if (doctorIndex !== -1) {
+        doctors[doctorIndex].horarios = doctors[doctorIndex].horarios.filter(h => h.id !== horarioId);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
+        renderHorariosList(doctors[doctorIndex].horarios);
+    }
+}
+
 
 // --- FUNCIONES DE ESPECIALIDADES ---
 
@@ -460,10 +536,18 @@ function displayReservas() {
   if (reservas && reservas.length > 0) {
     reservas.forEach((res) => {
       const medico = medicos.find((m) => m.id === res.medicoId);
+      
       const medicoNombre = medico
-        ? `${medico.nombre} ${medico.apellido}`
+        ? `${medico.nombre} ${medico.apellido} (${medico.especialidad})`
         : "Médico no encontrado";
-      const fecha = new Date(res.fechaHora).toLocaleString("es-AR");
+      
+      const fechaObj = new Date(res.fechaHora);
+      const dia = String(fechaObj.getDate()).padStart(2, '0');
+      const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const anio = fechaObj.getFullYear();
+      const hora = String(fechaObj.getHours()).padStart(2, '0');
+      const min = String(fechaObj.getMinutes()).padStart(2, '0');
+      const fecha = `${dia}/${mes}/${anio}, ${hora}:${min} hs.`;
 
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -471,7 +555,7 @@ function displayReservas() {
                 <td>${res.nombrePaciente}</td>
                 <td>${res.documento}</td>
                 <td>${medicoNombre}</td>
-                <td>${fecha} hs.</td>
+                <td>${fecha}</td>
                 <td>$${res.valorTotal.toFixed(2)}</td>
                 <td>
                     <button class="btn btn-danger btn-sm delete-res-btn" data-id="${
@@ -519,6 +603,9 @@ document.addEventListener("DOMContentLoaded", () => {
   displayObrasSociales();
   displayReservas();
   loadEspecialidadesOnSelect();
+  
+  document.getElementById("btn-agregar-horario").addEventListener("click", handleAgregarHorario);
+  document.getElementById("horarios-container").addEventListener("click", handleEliminarHorario);
 });
 
 document.getElementById("doctor-form").addEventListener("submit", handleFormSubmit);
