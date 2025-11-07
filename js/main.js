@@ -40,16 +40,10 @@ function displayDoctors() {
                 <td>${doctor.matricula}</td>
                 <td>$${doctor.valorConsulta}</td>
                 <td>${osNombres}</td>
-                <td><img src="${doctor.imagen}" alt="${
-        doctor.nombre
-      }" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
+                <td><img src="${doctor.imagen}" alt="${doctor.nombre}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;"></td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${
-                      doctor.id
-                    }">Eliminar</button>
-                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editarMedicoModal" data-id="${
-                      doctor.id
-                    }">Modificar</button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${doctor.id}">Eliminar</button>
+                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editarMedicoModal" data-id="${doctor.id}">Modificar</button>
                 </td>
             `;
       tableBody.appendChild(row);
@@ -63,7 +57,16 @@ function saveDoctor(newDoctor) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
 }
 
-function handleFormSubmit(event) {
+function imageToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+}
+
+async function handleFormSubmit(event) {
   event.preventDefault();
 
   const nameInput = document.getElementById("doctor-name");
@@ -73,6 +76,12 @@ function handleFormSubmit(event) {
   const valorInput = document.getElementById("doctor-valor-consulta");
   const imageInput = document.getElementById("doctor-image");
 
+  const file = imageInput.files[0];
+  let imagenBase64 = null;
+  if (file) {
+    imagenBase64 = await imageToBase64(file);
+  }
+
   const newDoctor = {
     id: getNextId(STORAGE_KEY),
     nombre: nameInput.value,
@@ -80,7 +89,7 @@ function handleFormSubmit(event) {
     especialidad: specialtyInput.value,
     matricula: matriculaInput.value,
     valorConsulta: valorInput.value,
-    imagen: imageInput.value,
+    imagen: imagenBase64,
     obrasSociales: [],
     horarios: [],
   };
@@ -131,32 +140,39 @@ function loadDoctorForEditing(id) {
       select.add(option);
     });
     select.value = doctorToEdit.especialidad;
-    
+
     renderHorariosList(doctorToEdit.horarios || []);
   }
 }
 
-function handleEditFormSubmit(id) {
+async function handleEditFormSubmit(id) {
+  const file = document.getElementById("edit-doctor-image").files[0];
+
+  let imagenBase64 = null;
+  if (file) {
+    imagenBase64 = await imageToBase64(file);
+  }
+
   const editedDoctorData = {
     nombre: document.getElementById("edit-doctor-name").value,
     apellido: document.getElementById("edit-doctor-lastname").value,
     especialidad: document.getElementById("edit-doctor-specialty").value,
     matricula: document.getElementById("edit-doctor-matricula").value,
     valorConsulta: document.getElementById("edit-doctor-valor-consulta").value,
-    imagen: document.getElementById("edit-doctor-image").value,
+    imagen: imagenBase64,
   };
 
   let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const doctorIndex = doctors.findIndex((doctor) => doctor.id === parseInt(id));
-  
+
   if (doctorIndex !== -1) {
     const originalDoctor = doctors[doctorIndex];
-    
+
     const updatedDoctor = {
-        ...originalDoctor,
-        ...editedDoctorData,
+      ...originalDoctor,
+      ...editedDoctorData,
     };
-    
+
     doctors[doctorIndex] = updatedDoctor;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
   }
@@ -177,71 +193,78 @@ function handleEditFormSubmit(id) {
 // --- NUEVAS FUNCIONES DE HORARIOS ---
 
 function renderHorariosList(horarios) {
-    const container = document.getElementById("horarios-container");
-    container.innerHTML = "";
-    
-    if (!horarios || horarios.length === 0) {
-        container.innerHTML = "<p class='text-muted'>No hay horarios cargados para este médico.</p>";
-        return;
-    }
+  const container = document.getElementById("horarios-container");
+  container.innerHTML = "";
 
-    horarios.forEach(horario => {
-        const horarioEl = document.createElement("div");
-        horarioEl.className = "d-flex justify-content-between align-items-center mb-2 p-2 border rounded";
-        horarioEl.innerHTML = `
+  if (!horarios || horarios.length === 0) {
+    container.innerHTML =
+      "<p class='text-muted'>No hay horarios cargados para este médico.</p>";
+    return;
+  }
+
+  horarios.forEach((horario) => {
+    const horarioEl = document.createElement("div");
+    horarioEl.className =
+      "d-flex justify-content-between align-items-center mb-2 p-2 border rounded";
+    horarioEl.innerHTML = `
             <span><strong>${horario.dia}</strong>: ${horario.inicio} - ${horario.fin}</span>
             <button type="button" class="btn btn-danger btn-sm btn-eliminar-horario" data-horario-id="${horario.id}">Eliminar</button>
         `;
-        container.appendChild(horarioEl);
-    });
+    container.appendChild(horarioEl);
+  });
 }
 
 function handleAgregarHorario() {
-    const dia = document.getElementById("horario-dia").value;
-    const inicio = document.getElementById("horario-inicio").value;
-    const fin = document.getElementById("horario-fin").value;
+  const dia = document.getElementById("horario-dia").value;
+  const inicio = document.getElementById("horario-inicio").value;
+  const fin = document.getElementById("horario-fin").value;
 
-    if (!inicio || !fin) {
-        Swal.fire("Error", "Debe completar la hora de inicio y fin", "error");
-        return;
-    }
+  if (!inicio || !fin) {
+    Swal.fire("Error", "Debe completar la hora de inicio y fin", "error");
+    return;
+  }
 
-    const newHorario = {
-        id: Date.now(),
-        dia,
-        inicio,
-        fin
-    };
+  const newHorario = {
+    id: Date.now(),
+    dia,
+    inicio,
+    fin,
+  };
 
-    let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    const doctorIndex = doctors.findIndex(doc => doc.id === parseInt(editDoctorId));
+  let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const doctorIndex = doctors.findIndex(
+    (doc) => doc.id === parseInt(editDoctorId)
+  );
 
-    if (doctorIndex !== -1) {
-        doctors[doctorIndex].horarios.push(newHorario);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
-        renderHorariosList(doctors[doctorIndex].horarios);
-    }
-    
-    document.getElementById("horario-inicio").value = "";
-    document.getElementById("horario-fin").value = "";
+  if (doctorIndex !== -1) {
+    doctors[doctorIndex].horarios.push(newHorario);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
+    renderHorariosList(doctors[doctorIndex].horarios);
+  }
+
+  document.getElementById("horario-inicio").value = "";
+  document.getElementById("horario-fin").value = "";
 }
 
 function handleEliminarHorario(evento) {
-    if (!evento.target.classList.contains("btn-eliminar-horario")) {
-        return;
-    }
-    
-    const horarioId = parseInt(evento.target.dataset.horarioId);
-    let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    const doctorIndex = doctors.findIndex(doc => doc.id === parseInt(editDoctorId));
+  if (!evento.target.classList.contains("btn-eliminar-horario")) {
+    return;
+  }
 
-    if (doctorIndex !== -1) {
-        doctors[doctorIndex].horarios = doctors[doctorIndex].horarios.filter(h => h.id !== horarioId);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
-        renderHorariosList(doctors[doctorIndex].horarios);
-    }
+  const horarioId = parseInt(evento.target.dataset.horarioId);
+  let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const doctorIndex = doctors.findIndex(
+    (doc) => doc.id === parseInt(editDoctorId)
+  );
+
+  if (doctorIndex !== -1) {
+    doctors[doctorIndex].horarios = doctors[doctorIndex].horarios.filter(
+      (h) => h.id !== horarioId
+    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
+    renderHorariosList(doctors[doctorIndex].horarios);
+  }
 }
-
 
 // --- FUNCIONES DE ESPECIALIDADES ---
 
@@ -489,7 +512,8 @@ function loadObraSocialForEditing(id) {
     document.getElementById("edit-obra-social-name").value = osToEdit.nombre;
     document.getElementById("edit-obra-social-desc").value =
       osToEdit.descripcion;
-    document.getElementById("edit-obra-social-pct").value = osToEdit.porcentaje * 100;
+    document.getElementById("edit-obra-social-pct").value =
+      osToEdit.porcentaje * 100;
   }
 }
 
@@ -504,9 +528,8 @@ function handleEditObraSocialSubmit(id) {
     obrasSociales[osIndex].descripcion = document.getElementById(
       "edit-obra-social-desc"
     ).value;
-    obrasSociales[osIndex].porcentaje = parseFloat(
-      document.getElementById("edit-obra-social-pct").value
-    ) / 100;
+    obrasSociales[osIndex].porcentaje =
+      parseFloat(document.getElementById("edit-obra-social-pct").value) / 100;
 
     localStorage.setItem("obras-sociales", JSON.stringify(obrasSociales));
   }
@@ -536,17 +559,17 @@ function displayReservas() {
   if (reservas && reservas.length > 0) {
     reservas.forEach((res) => {
       const medico = medicos.find((m) => m.id === res.medicoId);
-      
+
       const medicoNombre = medico
         ? `${medico.nombre} ${medico.apellido} (${medico.especialidad})`
         : "Médico no encontrado";
-      
+
       const fechaObj = new Date(res.fechaHora);
-      const dia = String(fechaObj.getDate()).padStart(2, '0');
-      const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const dia = String(fechaObj.getDate()).padStart(2, "0");
+      const mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
       const anio = fechaObj.getFullYear();
-      const hora = String(fechaObj.getHours()).padStart(2, '0');
-      const min = String(fechaObj.getMinutes()).padStart(2, '0');
+      const hora = String(fechaObj.getHours()).padStart(2, "0");
+      const min = String(fechaObj.getMinutes()).padStart(2, "0");
       const fecha = `${dia}/${mes}/${anio}, ${hora}:${min} hs.`;
 
       const row = document.createElement("tr");
@@ -603,31 +626,49 @@ document.addEventListener("DOMContentLoaded", () => {
   displayObrasSociales();
   displayReservas();
   loadEspecialidadesOnSelect();
-  
-  document.getElementById("btn-agregar-horario").addEventListener("click", handleAgregarHorario);
-  document.getElementById("horarios-container").addEventListener("click", handleEliminarHorario);
+
+  document
+    .getElementById("btn-agregar-horario")
+    .addEventListener("click", handleAgregarHorario);
+  document
+    .getElementById("horarios-container")
+    .addEventListener("click", handleEliminarHorario);
 });
 
-document.getElementById("doctor-form").addEventListener("submit", handleFormSubmit);
-document.getElementById("especialidad-form").addEventListener("submit", handleEspecialidadFormSubmit);
-document.getElementById("obra-social-form").addEventListener("submit", handleObraSocialFormSubmit);
+document
+  .getElementById("doctor-form")
+  .addEventListener("submit", handleFormSubmit);
+document
+  .getElementById("especialidad-form")
+  .addEventListener("submit", handleEspecialidadFormSubmit);
+document
+  .getElementById("obra-social-form")
+  .addEventListener("submit", handleObraSocialFormSubmit);
 
-document.getElementById("edit-doctor-form").addEventListener("submit", function (event) {
-  event.preventDefault();
-  handleEditFormSubmit(editDoctorId);
-});
+document
+  .getElementById("edit-doctor-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+    handleEditFormSubmit(editDoctorId);
+  });
 
-document.getElementById("edit-especialidad-form").addEventListener("submit", function (event) {
-  event.preventDefault();
-  handleEspecialidadEditFormSubmit(editEspecialidadId);
-});
+document
+  .getElementById("edit-especialidad-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+    handleEspecialidadEditFormSubmit(editEspecialidadId);
+  });
 
-document.getElementById("edit-obra-social-form").addEventListener("submit", function (event) {
-  event.preventDefault();
-  handleEditObraSocialSubmit(editObraSocialId);
-});
+document
+  .getElementById("edit-obra-social-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+    handleEditObraSocialSubmit(editObraSocialId);
+  });
 
-document.getElementById("medicos-table-body").addEventListener("click", (event) => {
+document
+  .getElementById("medicos-table-body")
+  .addEventListener("click", (event) => {
     if (event.target.classList.contains("delete-btn")) {
       const doctorId = parseInt(event.target.getAttribute("data-id"));
       Swal.fire({
@@ -656,9 +697,11 @@ document.getElementById("medicos-table-body").addEventListener("click", (event) 
       editDoctorId = parseInt(event.target.getAttribute("data-id"));
       loadDoctorForEditing(editDoctorId);
     }
-});
+  });
 
-document.getElementById("especialidades-table-body").addEventListener("click", (event) => {
+document
+  .getElementById("especialidades-table-body")
+  .addEventListener("click", (event) => {
     if (event.target.classList.contains("edit-esp-btn")) {
       editEspecialidadId = event.target.getAttribute("data-id");
       editEspecialidad(editEspecialidadId);
@@ -667,9 +710,11 @@ document.getElementById("especialidades-table-body").addEventListener("click", (
       const espId = event.target.getAttribute("data-id");
       deleteEspecialidad(espId);
     }
-});
+  });
 
-document.getElementById("obras-sociales-table-body").addEventListener("click", (event) => {
+document
+  .getElementById("obras-sociales-table-body")
+  .addEventListener("click", (event) => {
     if (event.target.classList.contains("edit-os-btn")) {
       editObraSocialId = event.target.getAttribute("data-id");
       loadObraSocialForEditing(editObraSocialId);
@@ -678,11 +723,13 @@ document.getElementById("obras-sociales-table-body").addEventListener("click", (
       const osId = event.target.getAttribute("data-id");
       deleteObraSocial(osId);
     }
-});
+  });
 
-document.getElementById("reservas-table-body").addEventListener("click", (event) => {
+document
+  .getElementById("reservas-table-body")
+  .addEventListener("click", (event) => {
     if (event.target.classList.contains("delete-res-btn")) {
       const resId = event.target.getAttribute("data-id");
       deleteReserva(resId);
     }
-});
+  });
