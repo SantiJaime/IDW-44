@@ -17,8 +17,8 @@
 - **Bootstrap**  
 - **Javascript**
 
-## Usuario y contraseña de ingrso al panel administrador:
-##                                                          
-Usuario: emilys
-Contraseña: emilyspass
-## 
+---
+
+## Usuario y contraseña de ingreso al panel administrador:                                                       
+- **Usuario:** emilys
+- **Contraseña:** emilyspass
