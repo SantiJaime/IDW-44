@@ -170,6 +170,25 @@ function renderObrasSociales() {
   }
 }
 
+function renderEspecialidades() {
+  const pathName = window.location.pathname;
+  if (pathName !== "/html/institucional.html") return;
+
+  const especialidadesContainer = document.getElementById(
+    "especialidades-container"
+  );
+
+  const especialidadesLS = JSON.parse(localStorage.getItem("especialidades"));
+  especialidadesLS.forEach(({ nombre }) => {
+    const especialidadButton = document.createElement("button");
+    especialidadButton.classList.add("button");
+    especialidadButton.classList.add("fw-bold");
+    especialidadButton.textContent = nombre;
+
+    especialidadesContainer.appendChild(especialidadButton);
+  });
+}
+
 function initializeData() {
   if (!localStorage.getItem("medicos_idw")) {
     localStorage.setItem("medicos_idw", JSON.stringify(initialDoctors));
@@ -200,6 +219,7 @@ function displayDoctors() {
                     <img src="${doctor.imagen}" class="card-img-top" alt="${doctor.nombre} ${doctor.apellido}" />
                     <div class="card-body">
                         <h5 class="card-title">Dr(a). ${doctor.nombre} ${doctor.apellido}</h5>
+                        <hr>
                         <p class="card-text">Especialidad: ${doctor.especialidad}</p>
                         <p class="card-text">Matrícula profesional: ${doctor.matricula}</p>
                     </div>
@@ -214,4 +234,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeData();
   displayDoctors();
   renderObrasSociales();
+  renderEspecialidades();
 });
