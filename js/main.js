@@ -32,7 +32,6 @@ function displayDoctors() {
         })
         .filter(Boolean)
         .join(", ");
-
       row.innerHTML = `
                 <td>${doctor.id}</td>
                 <td>${doctor.nombre} ${doctor.apellido}</td>
@@ -74,7 +73,13 @@ async function handleFormSubmit(event) {
   const specialtyInput = document.getElementById("doctor-specialty");
   const matriculaInput = document.getElementById("doctor-matricula");
   const valorInput = document.getElementById("doctor-valor-consulta");
+  const obraSocialInput = document.getElementById("doctor-obras-sociales");
   const imageInput = document.getElementById("doctor-image");
+
+  const opcionesSeleccionadas = Array.from(obraSocialInput.selectedOptions);
+  const idsObrasSocialesSeleccionadas = opcionesSeleccionadas.map((option) =>
+    parseInt(option.value)
+  );
 
   const file = imageInput.files[0];
   let imagenBase64 = null;
@@ -87,10 +92,10 @@ async function handleFormSubmit(event) {
     nombre: nameInput.value,
     apellido: lastNameInput.value,
     especialidad: specialtyInput.value,
-    matricula: matriculaInput.value,
-    valorConsulta: valorInput.value,
+    matricula: parseInt(matriculaInput.value),
+    valorConsulta: parseFloat(valorInput.value),
     imagen: imagenBase64,
-    obrasSociales: [],
+    obrasSociales: idsObrasSocialesSeleccionadas,
     horarios: [],
   };
 
@@ -129,18 +134,30 @@ function loadDoctorForEditing(id) {
       doctorToEdit.matricula;
     document.getElementById("edit-doctor-valor-consulta").value =
       doctorToEdit.valorConsulta;
-    document.getElementById("edit-doctor-image").value = doctorToEdit.imagen;
-    const select = document.getElementById("edit-doctor-specialty");
+    const selectEspecialidad = document.getElementById("edit-doctor-specialty");
 
-    select.innerHTML = "";
+    selectEspecialidad.innerHTML = "";
     especialidades.forEach((esp) => {
       const option = document.createElement("option");
       option.value = esp.nombre;
       option.text = esp.nombre;
-      select.add(option);
+      selectEspecialidad.add(option);
     });
-    select.value = doctorToEdit.especialidad;
+    selectEspecialidad.value = doctorToEdit.especialidad;
 
+    const selectObrasSociales = document.getElementById(
+      "edit-doctor-obras-sociales"
+    );
+    selectObrasSociales.innerHTML = "";
+    loadObrasSocialesOnSelect("edit-doctor-obras-sociales");
+    const idsDelMedico = doctorToEdit.obrasSociales || [];
+    Array.from(selectObrasSociales.options).forEach((option) => {
+      if (idsDelMedico.includes(parseInt(option.value))) {
+        option.selected = true;
+      } else {
+        option.selected = false;
+      }
+    });
     renderHorariosList(doctorToEdit.horarios || []);
   }
 }
@@ -153,15 +170,22 @@ async function handleEditFormSubmit(id) {
     imagenBase64 = await imageToBase64(file);
   }
 
+  const selectObrasSociales = document.getElementById(
+    "edit-doctor-obras-sociales"
+  );
+
+  const opcionesSeleccionadas = Array.from(selectObrasSociales.selectedOptions);
+  const idsObrasSocialesSeleccionadas = opcionesSeleccionadas.map((option) =>
+    parseInt(option.value)
+  );
   const editedDoctorData = {
     nombre: document.getElementById("edit-doctor-name").value,
     apellido: document.getElementById("edit-doctor-lastname").value,
     especialidad: document.getElementById("edit-doctor-specialty").value,
     matricula: document.getElementById("edit-doctor-matricula").value,
     valorConsulta: document.getElementById("edit-doctor-valor-consulta").value,
-    imagen: imagenBase64,
+    obrasSociales: idsObrasSocialesSeleccionadas,
   };
-
   let doctors = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const doctorIndex = doctors.findIndex((doctor) => doctor.id === parseInt(id));
 
@@ -171,8 +195,8 @@ async function handleEditFormSubmit(id) {
     const updatedDoctor = {
       ...originalDoctor,
       ...editedDoctorData,
+      imagen: imagenBase64 ? imagenBase64 : originalDoctor.imagen,
     };
-
     doctors[doctorIndex] = updatedDoctor;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(doctors));
   }
@@ -190,7 +214,7 @@ async function handleEditFormSubmit(id) {
   );
 }
 
-// --- NUEVAS FUNCIONES DE HORARIOS ---
+// --- FUNCIONES DE HORARIOS ---
 
 function renderHorariosList(horarios) {
   const container = document.getElementById("horarios-container");
@@ -439,6 +463,17 @@ function displayObrasSociales() {
   }
 }
 
+function loadObrasSocialesOnSelect(elementId) {
+  const obrasSociales = JSON.parse(localStorage.getItem("obras-sociales"));
+  const selectObrasSociales = document.getElementById(elementId);
+  obrasSociales.forEach(({ id, nombre }) => {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = nombre;
+    selectObrasSociales.appendChild(option);
+  });
+}
+
 function saveObraSocial(newObraSocial) {
   const obrasSociales =
     JSON.parse(localStorage.getItem("obras-sociales")) || [];
@@ -553,27 +588,51 @@ function handleEditObraSocialSubmit(id) {
 function displayReservas() {
   const reservas = JSON.parse(localStorage.getItem("reservas"));
   const medicos = JSON.parse(localStorage.getItem("medicos_idw"));
+  const table = document.getElementById("reservas-table");
+
+  if (!reservas || reservas.length === 0) {
+    table.classList.remove("table-responsive");
+    const h4 = document.createElement("h4");
+    h4.textContent = "No hay reservas registradas";
+    h4.classList.add("text-center");
+    table.appendChild(h4);
+    return;
+  }
+  table.innerHTML = `
+    <table class="table table-striped table-hover text-center">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Paciente</th>
+          <th scope="col">Documento</th>
+          <th scope="col">Médico</th>
+          <th scope="col">Fecha y Hora</th>
+          <th scope="col">Valor Total</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="reservas-table-body"></tbody>
+    </table>`;
+    
   const tableBody = document.getElementById("reservas-table-body");
   tableBody.innerHTML = "";
+  reservas.forEach((res) => {
+    const medico = medicos.find((m) => m.id === res.medicoId);
 
-  if (reservas && reservas.length > 0) {
-    reservas.forEach((res) => {
-      const medico = medicos.find((m) => m.id === res.medicoId);
+    const medicoNombre = medico
+      ? `${medico.nombre} ${medico.apellido} (${medico.especialidad})`
+      : "Médico no encontrado";
 
-      const medicoNombre = medico
-        ? `${medico.nombre} ${medico.apellido} (${medico.especialidad})`
-        : "Médico no encontrado";
+    const fechaObj = new Date(res.fechaHora);
+    const dia = String(fechaObj.getDate()).padStart(2, "0");
+    const mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
+    const anio = fechaObj.getFullYear();
+    const hora = String(fechaObj.getHours()).padStart(2, "0");
+    const min = String(fechaObj.getMinutes()).padStart(2, "0");
+    const fecha = `${dia}/${mes}/${anio}, ${hora}:${min} hs.`;
 
-      const fechaObj = new Date(res.fechaHora);
-      const dia = String(fechaObj.getDate()).padStart(2, "0");
-      const mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
-      const anio = fechaObj.getFullYear();
-      const hora = String(fechaObj.getHours()).padStart(2, "0");
-      const min = String(fechaObj.getMinutes()).padStart(2, "0");
-      const fecha = `${dia}/${mes}/${anio}, ${hora}:${min} hs.`;
-
-      const row = document.createElement("tr");
-      row.innerHTML = `
+    const row = document.createElement("tr");
+    row.innerHTML = `
                 <td>${res.id}</td>
                 <td>${res.nombrePaciente}</td>
                 <td>${res.documento}</td>
@@ -586,9 +645,8 @@ function displayReservas() {
                     }">Eliminar</button>
                 </td>
             `;
-      tableBody.appendChild(row);
-    });
-  }
+    tableBody.appendChild(row);
+  });
 }
 
 function deleteReserva(id) {
@@ -626,6 +684,7 @@ document.addEventListener("DOMContentLoaded", () => {
   displayObrasSociales();
   displayReservas();
   loadEspecialidadesOnSelect();
+  loadObrasSocialesOnSelect("doctor-obras-sociales");
 
   document
     .getElementById("btn-agregar-horario")
