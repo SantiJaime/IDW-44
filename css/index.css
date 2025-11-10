@@ -47,6 +47,7 @@ main {
   font-size: 16px;
   border-radius: 8px;
   transition: background 0.3s ease, transform 0.2s ease;
+  cursor: default !important;
 }
 
 .button:hover {
