@@ -591,6 +591,7 @@ function displayReservas() {
   const table = document.getElementById("reservas-table");
 
   if (!reservas || reservas.length === 0) {
+    table.innerHTML = "";
     table.classList.remove("table-responsive");
     const h4 = document.createElement("h4");
     h4.textContent = "No hay reservas registradas";
@@ -613,7 +614,7 @@ function displayReservas() {
       </thead>
       <tbody id="reservas-table-body"></tbody>
     </table>`;
-    
+
   const tableBody = document.getElementById("reservas-table-body");
   tableBody.innerHTML = "";
   reservas.forEach((res) => {
@@ -784,11 +785,9 @@ document
     }
   });
 
-document
-  .getElementById("reservas-table-body")
-  .addEventListener("click", (event) => {
-    if (event.target.classList.contains("delete-res-btn")) {
-      const resId = event.target.getAttribute("data-id");
-      deleteReserva(resId);
-    }
-  });
+document.getElementById("reservas-table").addEventListener("click", (event) => {
+  if (event.target.classList.contains("delete-res-btn")) {
+    const resId = event.target.getAttribute("data-id");
+    deleteReserva(resId);
+  }
+});
