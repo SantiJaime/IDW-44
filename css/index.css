@@ -108,6 +108,7 @@ main {
   border-radius: 8px;
   border: 1px solid #004aad;
   transition: all 0.3s ease;
+  cursor: default !important;
 }
 
 .button:hover {
