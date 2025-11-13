@@ -16,3 +16,9 @@
 - **Herramientas de control de versiones: Git & GitHub**  
 - **Bootstrap**  
 - **Javascript**
+
+---
+
+## Usuario y contraseña de ingreso al panel administrador:                                                       
+- **Usuario:** emilys
+- **Contraseña:** emilyspass

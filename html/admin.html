@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IDW S.A - Administración</title>
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -14,110 +15,25 @@
     <link rel="stylesheet" href="../css/index.css" />
   </head>
   <body>
-    <header id="navbar-container">
- 
-    </header>
+    <header id="navbar-container"></header>
     <main>
-      <section class="container-fluid py-3">
-        <h2 class="text-center">Crear Nuevo Médico</h2>
-        <hr class="separador" />
-        <form id="doctor-form" class="p-4 border rounded">
-          <div class="mb-3">
-            <label for="doctor-name" class="form-label"
-              >Nombre del Médico:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="doctor-name"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="doctor-specialty" class="form-label"
-              >Especialidad:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="doctor-specialty"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="doctor-image" class="form-label"
-              >URL de la Imagen:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="doctor-image"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn-primary w-100">
-            Agregar Médico
-          </button>
-        </form>
-      </section>
-
-      <section
-        id="edit-form-section"
-        class="container-fluid py-3"
-        style="display: none"
-      >
-        <h2 class="text-center">Modificar Médico</h2>
-        <hr class="separador" />
-        <form id="edit-doctor-form" class="p-4 border rounded">
-          <input type="hidden" id="edit-doctor-id" />
-          <div class="mb-3">
-            <label for="edit-doctor-name" class="form-label"
-              >Nombre del Médico:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="edit-doctor-name"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="edit-doctor-specialty" class="form-label"
-              >Especialidad:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="edit-doctor-specialty"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="edit-doctor-image" class="form-label"
-              >URL de la Imagen:</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="edit-doctor-image"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn-warning w-100">
-            Guardar Cambios
-          </button>
+      <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-end mb-3">
+          <a href="usuarios.html" class="btn btn-info"
+            >Ir a gestión de usuarios</a
+          >
+        </div>
+        <div class="d-flex justify-content-between">
+          <h2 class="text-center">Médicos</h2>
           <button
             type="button"
-            class="btn btn-secondary w-100 mt-2"
-            id="cancel-edit-btn"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearMedicoModal"
           >
-            Cancelar
+            Crear nuevo médico
           </button>
-        </form>
-      </section>
-
-      <section class="container-fluid">
-        <h2 class="text-center">Profesionales con los que contamos</h2>
+        </div>
         <hr class="separador" />
         <div class="table-responsive">
           <table class="table table-striped table-hover text-center">
@@ -126,6 +42,9 @@
                 <th scope="col">ID</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">Especialidad</th>
+                <th scope="col">Matrícula profesional</th>
+                <th scope="col">Valor de la consulta</th>
+                <th scope="col">Obras sociales que recibe</th>
                 <th scope="col">Imagen</th>
                 <th scope="col">Acciones</th>
               </tr>
@@ -134,16 +53,572 @@
           </table>
         </div>
       </section>
+
+      <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-between">
+          <h2 class="text-center">Especialidades médicas</h2>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearEspecialidadModal"
+          >
+            Crear nueva especialidad
+          </button>
+        </div>
+        <hr class="separador" />
+        <div class="table-responsive">
+          <table class="table table-striped table-hover text-center">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="especialidades-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-between">
+          <h2 class="text-center">Obras sociales</h2>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearObraSocialModal"
+          >
+            Crear nueva obra social
+          </button>
+        </div>
+        <hr class="separador" />
+        <div class="table-responsive">
+          <table class="table table-striped table-hover text-center">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Porcentaje Descuento</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="obras-sociales-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="container-fluid mt-3">
+        <div class="d-flex justify-content-between">
+          <h2 class="text-center">Reservas</h2>
+        </div>
+        <hr class="separador" />
+        <div class="table-responsive" id="reservas-table">
+        </div>
+      </section>
+
+      <div
+        class="modal fade"
+        id="crearMedicoModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Crear nuevo médico
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="doctor-form">
+                <div class="mb-3">
+                  <label for="doctor-name" class="form-label">Nombre:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="doctor-name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="doctor-lastname" class="form-label"
+                    >Apellido:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="doctor-lastname"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="doctor-matricula" class="form-label"
+                    >Matricula profesional:</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="doctor-matricula"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="doctor-valor-consulta" class="form-label"
+                    >Valor de consulta:</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="doctor-valor-consulta"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="doctor-specialty" class="form-label"
+                    >Especialidad:</label
+                  >
+                  <select class="form-select" id="doctor-specialty"></select>
+                </div>
+                <div class="mb-3">
+                  <label for="doctor-image" class="form-label">Imagen:</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    accept="image/*"
+                    id="doctor-image"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="doctor-obras-sociales" class="form-label"
+                    >Obras sociales que recibe (mantener Ctrl/Cmd para seleccionar
+                    varias):</label
+                  >
+                  <select
+                    class="form-select"
+                    id="doctor-obras-sociales"
+                    multiple
+                    required
+                    size="5"
+                  ></select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Agregar médico
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="editarMedicoModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Editar médico
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-doctor-form">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-name" class="form-label"
+                        >Nombre:</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="edit-doctor-name"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-lastname" class="form-label"
+                        >Apellido:</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="edit-doctor-lastname"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-matricula" class="form-label"
+                        >Matricula profesional:</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="edit-doctor-matricula"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-valor-consulta" class="form-label"
+                        >Valor de consulta:</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="edit-doctor-valor-consulta"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-specialty" class="form-label"
+                        >Especialidad:</label
+                      >
+                      <select
+                        class="form-select"
+                        id="edit-doctor-specialty"
+                      ></select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="edit-doctor-image" class="form-label"
+                        >Imagen:</label
+                      >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="form-control"
+                        id="edit-doctor-image"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                <div class="row">
+                  <div class="col-12">
+                    <div class="mb-3">
+                      <label for="edit-doctor-obras-sociales" class="form-label"
+                        >Obras sociales que recibe (mantener Ctrl/Cmd para seleccionar
+                        varias):</label
+                      >
+                      <select
+                        class="form-select"
+                        id="edit-doctor-obras-sociales"
+                        multiple
+                        required
+                        size="5"
+                      ></select>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                <h5 class="mt-4">Gestión de horarios</h5>
+                <div id="horarios-container"></div>
+
+                <div class="row g-3 align-items-center mt-2 p-2 border rounded">
+                  <div class="col-md-3">
+                    <label for="horario-dia" class="form-label">Día</label>
+                    <select id="horario-dia" class="form-select">
+                      <option value="Lunes">Lunes</option>
+                      <option value="Martes">Martes</option>
+                      <option value="Miércoles">Miércoles</option>
+                      <option value="Jueves">Jueves</option>
+                      <option value="Viernes">Viernes</option>
+                      <option value="Sábado">Sábado</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="horario-inicio" class="form-label"
+                      >Inicio (HH:mm)</label
+                    >
+                    <input
+                      type="time"
+                      id="horario-inicio"
+                      class="form-control"
+                      step="1800"
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <label for="horario-fin" class="form-label"
+                      >Fin (HH:mm)</label
+                    >
+                    <input
+                      type="time"
+                      id="horario-fin"
+                      class="form-control"
+                      step="1800"
+                    />
+                  </div>
+                  <div class="col-md-3 d-flex align-items-end">
+                    <button
+                      type="button"
+                      class="btn btn-success w-100"
+                      id="btn-agregar-horario"
+                    >
+                      Agregar
+                    </button>
+                  </div>
+                </div>
+
+                <hr class="mt-4" />
+
+                <button type="submit" class="btn btn-primary w-100 mt-3">
+                  Guardar cambios
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="modal fade"
+        id="crearEspecialidadModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Crear nueva especialidad
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="especialidad-form">
+                <div class="mb-3">
+                  <label for="especialidad-name" class="form-label"
+                    >Nombre:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="especialidad-name"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Agregar especialidad
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="modal fade"
+        id="editarEspecialidadModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Editar especialidad
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-especialidad-form">
+                <div class="mb-3">
+                  <label for="edit-especialidad-name" class="form-label"
+                    >Nombre:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-especialidad-name"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Guardar cambios
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="crearObraSocialModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Crear nueva obra social
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="obra-social-form">
+                <div class="mb-3">
+                  <label for="obra-social-name" class="form-label"
+                    >Nombre:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="obra-social-name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="obra-social-desc" class="form-label"
+                    >Descripción:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="obra-social-desc"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="obra-social-pct" class="form-label"
+                    >Porcentaje (Ej: 30 para 30%):</label
+                  >
+                  <input
+                    type="number"
+                    step="1"
+                    class="form-control"
+                    id="obra-social-pct"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Agregar Obra Social
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="modal fade"
+        id="editarObraSocialModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Editar Obra Social
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-obra-social-form">
+                <div class="mb-3">
+                  <label for="edit-obra-social-name" class="form-label"
+                    >Nombre:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-obra-social-name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="edit-obra-social-desc" class="form-label"
+                    >Descripción:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-obra-social-desc"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="edit-obra-social-pct" class="form-label"
+                    >Porcentaje (Ej: 30 para 30%):</label
+                  >
+                  <input
+                    type="number"
+                    step="1"
+                    class="form-control"
+                    id="edit-obra-social-pct"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Guardar cambios
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <footer>
       <div class="row w-100 align-items-center">
         <div class="d-flex justify-content-center col-lg-4 col-md-6 col-sm-12">
-          <img
-            src="../img/logo.png"
-            alt="Centro médico IDW-44"
-            width="150"
-          />
+          <img src="../img/logo.png" alt="Centro médico IDW-44" width="150" />
         </div>
         <div
           class="d-flex justify-content-center align-items-center flex-column col-lg-4 col-md-6 col-sm-12"

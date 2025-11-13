@@ -1,5 +1,5 @@
 function logOut() {
-  localStorage.removeItem("admin");
+  sessionStorage.removeItem("token");
 
   const pathName = window.location.pathname;
   const isInsideHtmlFolder = pathName.includes("/html/");
@@ -15,6 +15,7 @@ function renderNavbar() {
   let indexHref;
   let contactoHref;
   let institucionalHref;
+  let reservasHref;
   let loginHref;
   let adminHref;
 
@@ -27,6 +28,7 @@ function renderNavbar() {
     contactoHref = "contacto.html";
     institucionalHref = "institucional.html";
     loginHref = "login.html";
+    reservasHref = "reservas.html";
     adminHref = "admin.html";
   } else {
     logoImgSrc = "img/logo.png";
@@ -35,12 +37,13 @@ function renderNavbar() {
     contactoHref = "html/contacto.html";
     institucionalHref = "html/institucional.html";
     loginHref = "html/login.html";
+    reservasHref = "html/reservas.html";
     adminHref = "html/admin.html";
   }
 
   const isActive = (fileName) => (pathName.includes(fileName) ? " active" : "");
 
-  const isLoggedIn = JSON.parse(localStorage.getItem("admin"));
+  const isLoggedIn = sessionStorage.getItem("token");
 
   const adminLink = isLoggedIn
     ? `<li class="nav-item">
@@ -105,6 +108,11 @@ function renderNavbar() {
                 <a class="nav-link${isActive(
                   "institucional.html"
                 )}" href="${institucionalHref}">Institucional</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link${isActive(
+                  "reservas.html"
+                )}" href="${reservasHref}">Reservas</a>
               </li>
               ${adminLink}
               ${logOutButton}
