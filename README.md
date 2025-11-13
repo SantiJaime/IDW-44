@@ -23,3 +23,7 @@
 ## Usuario y contraseña de ingreso al panel administrador:                                                       
 - **Usuario:** emilys
 - **Contraseña:** emilyspass
+
+---
+## Video explicativo
+https://drive.google.com/file/d/1ZcG7GxttWTJrvexEvQW5Sf3iX61vOz9A/view?usp=drive_link
